@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.5.2
+ * @version 1.5.3
  *
  * Copyright © 2012 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -32,14 +32,14 @@ if (jQuery) (function($) {
 		
 		destroy: function() {
 			_close($.Event("click"));
-			return $(this).off(".smart-box");
+			return $(this).off(".boxer");
 		}
 	};
 	
 	// Initialize
 	function _init(opts) {
 		options.formatter = _formatCaption;
-		return $(this).on("click.smart-box", $.extend({}, options, opts || {}), _build);
+		return $(this).on("click.boxer", $.extend({}, options, opts || {}), _build);
 	}
 	
 	// Build Boxer
@@ -140,11 +140,11 @@ if (jQuery) (function($) {
 			_updatePagination();
 			
 			// Bind events
-			$(window).on("resize.smart-box", _resize)
-					 .on("keydown.smart-box", _keypress);
-			$("body").on("click.smart-box", "#boxer-overlay, #boxer .boxer-close", _close);
+			$(window).on("resize.boxer", _resize)
+					 .on("keydown.boxer", _keypress);
+			$("body").on("click.boxer", "#boxer-overlay, #boxer .boxer-close", _close);
 			if (data.gallery.active) {
-				data.$boxer.on("click.smart-box", ".boxer-arrow", _advanceGallery);
+				data.$boxer.on("click.boxer", ".boxer-arrow", _advanceGallery);
 			}
 			
 			data.$overlay.animate({ opacity: 0.75 }, data.options.duration);
@@ -156,7 +156,7 @@ if (jQuery) (function($) {
 				} else if (is_element) {
 					_cloneElement(source);
 				} else {
-					$.error("SMART-BOX: '" +  source + "' is not valid.");
+					$.error("BOXER: '" +  source + "' is not valid.");
 				}
 			});
 		}
@@ -191,10 +191,10 @@ if (jQuery) (function($) {
 			resizeTimer = null;
 			
 			// Clean up
-			$(window).off(".smart-box")
-			$("body").off(".smart-box");
+			$(window).off(".boxer")
+			$("body").off(".boxer");
 			if (data.gallery.active) {
-				data.$boxer.off(".smart-box");
+				data.$boxer.off(".boxer");
 			}
 			data = {};
 		}
@@ -221,7 +221,7 @@ if (jQuery) (function($) {
 		// Cache current image
 		data.$image = $("<img />");
 		
-		data.$image.one("load.smart-box", function() {
+		data.$image.one("load.boxer", function() {
 			data.originalHeight = data.$image[0].height;
 			data.originalWidth = data.$image[0].width;
 			
