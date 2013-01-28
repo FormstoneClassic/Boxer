@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.5.5
+ * @version 1.5.6
  *
  * Copyright © 2012 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -280,6 +280,14 @@ if (jQuery) (function($) {
 		var metaHeight = (count == 0) ? 0 : data.metaHeight;
 		var windowWidth = $(window).width() - data.options.margin - data.padding;
 		var windowHeight = $(window).height() - data.options.margin - data.padding - metaHeight;
+		
+		// Double check min and max
+		if (height < data.options.minHeight) {
+			data.options.minHeight = height;
+		}
+		if (width < data.options.minWidth) {
+			data.options.minWidth = width;
+		}
 		
 		var newWidth = width;
 		var newHeight = height;
