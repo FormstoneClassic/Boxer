@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.5.6
+ * @version 1.5.7
  *
  * Copyright © 2012 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -105,7 +105,7 @@ if (jQuery) (function($) {
 			}
 			html += '" style="opacity: 0;';
 			if (data.options.fixed === true) {
-				html += " position: absolute;";
+				html += ' position: fixed;'
 			}
 			html += '">';
 			html += '<span class="boxer-close">Close</span>';
@@ -183,7 +183,10 @@ if (jQuery) (function($) {
 	// Open boxer
 	function _open() {
 		var newLeft = ($(window).width() - data.contentWidth - data.padding) / 2;
-		var newTop = (data.options.top <= 0) ? (($(window).height() - data.contentHeight - data.padding) / 2) + $(window).scrollTop() : data.options.top;
+		var newTop = (data.options.top <= 0) ? (($(window).height() - data.contentHeight - data.padding) / 2) : data.options.top;
+		if (data.options.fixed !== true) {
+			newTop += $(window).scrollTop();
+		}
 		
 		var arrowHeight = data.$arrows.outerHeight();
 		data.$arrows.css({ marginTop: ((data.contentHeight - data.metaHeight - arrowHeight) / 2) });
@@ -230,7 +233,10 @@ if (jQuery) (function($) {
 	// Center boxer on resize
 	function _center() {
 		var newLeft = ($(window).width() - data.$boxer.width() - data.padding) / 2;
-		var newTop = (data.options.top <= 0) ? (($(window).height() - data.$boxer.height() - data.padding) / 2) + $(window).scrollTop() : data.options.top;
+		var newTop = (data.options.top <= 0) ? (($(window).height() - data.$boxer.height() - data.padding) / 2) : data.options.top;
+		if (data.options.fixed !== true) {
+			newTop += $(window).scrollTop();
+		}
 		data.$boxer.css({ left: newLeft, top: newTop });
 	}
 	
