@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.5.7
+ * @version 1.5.8
  *
  * Copyright © 2012 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -408,7 +408,7 @@ if (jQuery) (function($) {
 	
 	// Clone inline element
 	function _cloneElement(id) {
-		var $clone = $($(id).html());
+		var $clone = $(id).find(">:first-child").clone();
 		data.$content.append($clone);
 		
 		var cloneHeight = $clone.outerHeight(true);
