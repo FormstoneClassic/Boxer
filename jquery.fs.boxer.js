@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.6.2
+ * @version 1.6.3
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -39,14 +39,9 @@ if (jQuery) (function($) {
 		
 		resize: function(e, height, width) {
 			if (typeof data.$boxer != "undefined") {
-				data.contentHeight = height || data.$object.outerHeight(true);
-				data.contentWidth = width || data.$object.outerWidth(true);
-				var maxHeight = $(window).height() - data.options.margin - data.padding;
 				
-				data.$content.css({ width: data.contentWidth });
-				if (maxHeight !== false && data.contentHeight > maxHeight && typeof data.$object == 'undefined') {
-					data.contentHeight = maxHeight;
-					data.$content.css({ height: maxHeight, overflowY: "scroll" });
+				if (data.type == "element") {
+					_sizeContent(data.$content.find(">:first-child"));
 				}
 				
 				_open();
@@ -87,7 +82,8 @@ if (jQuery) (function($) {
 				gallery: {
 					active: false
 				},
-				options: e.data
+				options: e.data,
+				type: (is_image) ? "image" : "element"
 			};
 			
 			if (is_image) {
@@ -432,20 +428,26 @@ if (jQuery) (function($) {
 	// Load URL into iFrame
 	function _loadURL(source) {
 		var $iframe = $('<iframe class="boxer-iframe" src="' + source + '" />');
-		_appendObject($iframe, true);
+		_appendObject($iframe);
 	}
 	
 	// Append jQuery object
-	function _appendObject($obj, iframe) {
+	function _appendObject($obj) {
 		data.$content.append($obj);
-		
+		_sizeContent($obj);
+		_open();
+	}
+	
+	// Size jQuery object
+	function _sizeContent($obj) {
 		var objHeight = $obj.outerHeight(true),
 			objWidth = $obj.outerWidth(true),
 			windowHeight = $(window).height() - data.options.margin - data.padding,
 			windowWidth = $(window).width() - data.options.margin - data.padding,
 			dataHeight = data.$target.data("height"),
 			dataWidth = data.$target.data("width"),
-			maxHeight = (windowHeight < 0) ? options.minHeight : windowHeight;
+			maxHeight = (windowHeight < 0) ? options.minHeight : windowHeight,
+			iframe = $obj.is("iframe");
 		
 		data.contentHeight = (dataHeight != undefined) ? dataHeight : (iframe) ? windowHeight : objHeight;
 		data.contentWidth = (dataWidth != undefined) ? dataWidth : (iframe) ? windowWidth : objWidth;
@@ -455,10 +457,10 @@ if (jQuery) (function($) {
 			if (!iframe) {
 				data.$content.css({ overflowY: "scroll" });
 			}
+		} else {
+			data.$content.css({ overflowY: "auto" });
 		}
 		data.$content.css({ height: data.contentHeight, width: data.contentWidth });
-		
-		_open();
 	}
 	
 	// Define Plugin
