@@ -1,9 +1,9 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.5.9
+ * @version 1.6.1
  *
- * Copyright © 2012 Ben Plum <mr@benplum.com>
+ * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
  */
  
@@ -11,6 +11,7 @@ if (jQuery) (function($) {
 	
 	// Default Options
 	var options = {
+		callback: function() {},
 		customClass: "",
 		duration: 250,
 		fixed: false,
@@ -19,6 +20,7 @@ if (jQuery) (function($) {
 		margin: 100,
 		minHeight: 200,
 		minWidth: 200,
+		opacity: 0.75,
 		retina: false,
 		top: 0,
 		width: 100
@@ -36,17 +38,19 @@ if (jQuery) (function($) {
 		},
 		
 		resize: function(e, height, width) {
-			data.contentHeight = height;
-			data.contentWidth = width;
-			var maxHeight = $(window).height() - data.options.margin - data.padding;
-			
-			data.$content.css({ width: data.contentWidth });
-			if (maxHeight !== false && data.contentHeight > maxHeight) {
-				data.contentHeight = maxHeight;
-				data.$content.css({ height: maxHeight, overflowY: "scroll" });
+			if (typeof data.$boxer != "undefined") {
+				data.contentHeight = height || data.$object.outerHeight(true);
+				data.contentWidth = width || data.$object.outerWidth(true);
+				var maxHeight = $(window).height() - data.options.margin - data.padding;
+				
+				data.$content.css({ width: data.contentWidth });
+				if (maxHeight !== false && data.contentHeight > maxHeight && typeof data.$object == 'undefined') {
+					data.contentHeight = maxHeight;
+					data.$content.css({ height: maxHeight, overflowY: "scroll" });
+				}
+				
+				_open();
 			}
-			
-			_open();
 		}
 	};
 	
@@ -62,20 +66,24 @@ if (jQuery) (function($) {
 		e.stopPropagation();
 		
 		// Check target type
-		var $target = $(this);
-		var source = $target.attr("href");
-		var checkExt = source.toLowerCase().split(".");
-		var extension = checkExt[ checkExt.length - 1 ];
+		var $target = $(this),
+			$object = e.data.$object,
+			source = $target.attr("href") || "",
+			checkExt = source.toLowerCase().split("."),
+			extension = checkExt[ checkExt.length - 1 ],
+			type = $target.data("type") || "";
 		
-		var is_image = (extension == "jpeg" || extension == "jpg" || extension == "gif" || extension == "png");
-		var is_url = (!is_image && source.substr(0, 4) == "http");
-		var is_element = (!is_image && !is_url && $(source).length > 0);
+		var is_image    = ( (type == "image") || (extension == "jpeg" || extension == "jpg" || extension == "gif" || extension == "png") ),
+			is_url 		= ( (type == "url") || (!is_image && source.substr(0, 4) == "http") ),
+			is_element  = ( (type == "element") || (!is_image && !is_url && $(source).length > 0) ),
+			is_object   = ( (typeof $object !== "undefined") );
 		
 		// Check if one already exists
-		if ($("#boxer").length < 1 && (is_image || is_url || is_element)) {
+		if ($("#boxer").length < 1 && (is_image || is_url || is_element || is_object)) {
 			// Cache internal data
 			data = {
 				$target: $target,
+				$object: $object,
 				gallery: {
 					active: false
 				},
@@ -95,7 +103,7 @@ if (jQuery) (function($) {
 			}
 			
 			// Assemble HTML
-			var html = '<div id="boxer-overlay" style="opacity: 0"></div>';
+			var html = '<div id="boxer-overlay" class="' + data.options.customClass + '" style="opacity: 0"></div>';
 			html += '<div id="boxer" class="' + data.options.customClass;
 			if (is_url) {
 				html += ' iframe';
@@ -151,7 +159,9 @@ if (jQuery) (function($) {
 			
 			// Center / update gallery
 			_center();
-			_updatePagination();
+			if (data.gallery.active) {
+				_updatePagination();
+			}
 			
 			// Bind events
 			$(window).on("resize.boxer", _resize)
@@ -160,23 +170,27 @@ if (jQuery) (function($) {
 			if (data.gallery.active) {
 				data.$boxer.on("click.boxer", ".boxer-arrow", _advanceGallery);
 			}
-			if (is_element || is_url) {
+			if (is_url || is_element || is_object) {
 				data.$boxer.on("resize.boxer", pub.resize)
 						   .on("close.boxer", _close);
 			}
-			
-			data.$overlay.animate({ opacity: 0.75 }, data.options.duration);
-			data.$boxer.animate({ opacity: 1 }, data.options.duration, function() { 
+			data.$overlay.stop().animate({ opacity: data.options.opacity }, data.options.duration);
+			data.$boxer.stop().animate({ opacity: 1 }, data.options.duration, function() { 
 				if (is_image) {
 					_loadImage(source);
 				} else if(is_url) {
 					_loadURL(source);
 				} else if (is_element) {
 					_cloneElement(source);
+				} else if (is_object) {
+					_appendObject(data.$object);
 				} else {
 					$.error("BOXER: '" +  source + "' is not valid.");
 				}
 			});
+		}
+		if (is_object) {
+			return data.$boxer;
 		}
 	}
 	
@@ -191,10 +205,13 @@ if (jQuery) (function($) {
 		var arrowHeight = data.$arrows.outerHeight();
 		data.$arrows.css({ marginTop: ((data.contentHeight - data.metaHeight - arrowHeight) / 2) });
 		
-		data.$boxer.animate({ left: newLeft, top: newTop }, data.options.duration);
-		data.$container.show().animate({ height: data.contentHeight, width: data.contentWidth }, data.options.duration, function(e) {
-			data.$container.animate({ opacity: 1 }, data.options.duration);
-			data.$boxer.find(".boxer-close").animate({ opacity: 1 }, data.options.duration);
+		data.$boxer.stop().animate({ left: newLeft, top: newTop }, data.options.duration);
+		data.$container.show().stop().animate({ height: data.contentHeight, width: data.contentWidth }, data.options.duration, function(e) {
+			data.$container.stop().animate({ opacity: 1 }, data.options.duration);
+			data.$boxer.find(".boxer-close").stop().animate({ opacity: 1 }, data.options.duration);
+			
+			// Fire callback
+			data.options.callback.apply(data.$boxer);
 		});
 	}
 	
@@ -204,7 +221,7 @@ if (jQuery) (function($) {
 		e.stopPropagation();
 		
 		if (typeof data.$animatables !== "undefined") {
-			data.$animatables.animate({ opacity: 0 }, data.options.duration, function() {
+			data.$animatables.stop().animate({ opacity: 0 }, data.options.duration, function() {
 				$(this).remove();
 			});
 			
@@ -370,7 +387,7 @@ if (jQuery) (function($) {
 				data.gallery.index = 0;
 			}
 			
-			data.$container.animate({opacity: 0}, data.options.duration, function() {
+			data.$container.stop().animate({opacity: 0}, data.options.duration, function() {
 				data.$image.remove();
 				data.$target = data.gallery.$items.eq(data.gallery.index);
 				
@@ -409,38 +426,36 @@ if (jQuery) (function($) {
 	// Clone inline element
 	function _cloneElement(id) {
 		var $clone = $(id).find(">:first-child").clone();
-		data.$content.append($clone);
-		
-		var cloneHeight = $clone.outerHeight(true);
-		var cloneWidth = $clone.outerWidth(true);
-		var dataHeight = data.$target.data("height");
-		var dataWidth = data.$target.data("width");
-		
-		data.contentHeight = (dataHeight != undefined) ? dataHeight : cloneHeight;
-		data.contentWidth = (dataWidth != undefined) ? dataWidth : cloneWidth;
-		var maxHeight = (dataHeight != undefined) ? false : ($(window).height() - data.options.margin - data.padding);
-		
-		data.$content.css({ width: data.contentWidth });
-		if (maxHeight !== false && data.contentHeight > maxHeight) {
-			data.contentHeight = maxHeight;
-			data.$content.css({ height: maxHeight, overflowY: "scroll" });
-		}
-		
-		_open();
+		_appendObject($clone);
 	}
 	
 	// Load URL into iFrame
 	function _loadURL(source) {
 		var $iframe = $('<iframe class="boxer-iframe" src="' + source + '" />');
-		data.$content.append($iframe);
+		_appendObject($iframe, true);
+	}
+	
+	// Append jQuery object
+	function _appendObject($obj, iframe) {
+		data.$content.append($obj);
 		
-		var windowHeight = $(window).height() - data.options.margin - data.padding;
-		var windowWidth = $(window).width() - data.options.margin - data.padding;
-		var dataHeight = data.$target.data("height");
-		var dataWidth = data.$target.data("width");
+		var objHeight = $obj.outerHeight(true),
+			objWidth = $obj.outerWidth(true),
+			windowHeight = $(window).height() - data.options.margin - data.padding,
+			windowWidth = $(window).width() - data.options.margin - data.padding,
+			dataHeight = data.$target.data("height"),
+			dataWidth = data.$target.data("width"),
+			maxHeight = (windowHeight < 0) ? options.minHeight : windowHeight;
 		
-		data.contentHeight = (dataHeight != undefined) ? dataHeight : windowHeight;
-		data.contentWidth = (dataWidth != undefined) ? dataWidth : windowWidth;
+		data.contentHeight = (dataHeight != undefined) ? dataHeight : (iframe) ? windowHeight : objHeight;
+		data.contentWidth = (dataWidth != undefined) ? dataWidth : (iframe) ? windowWidth : objWidth;
+		
+		if (data.contentHeight > maxHeight) {
+			data.contentHeight = maxHeight;
+			if (!iframe) {
+				data.$content.css({ overflowY: "scroll" });
+			}
+		}
 		data.$content.css({ height: data.contentHeight, width: data.contentWidth });
 		
 		_open();
@@ -455,4 +470,10 @@ if (jQuery) (function($) {
 		}
 		return this;	
 	};
+	
+	$.boxer = function($target, opts) {
+		return _build($.Event("click", { data: $.extend({
+			$object: $target
+		}, options, opts || {}) }));
+	}
 })(jQuery);
