@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.6.3
+ * @version 1.6.4
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -68,9 +68,9 @@ if (jQuery) (function($) {
 			extension = checkExt[ checkExt.length - 1 ],
 			type = $target.data("type") || "";
 		
-		var is_image    = ( (type == "image") || (extension == "jpeg" || extension == "jpg" || extension == "gif" || extension == "png") ),
+		var is_image    = ( (type == "image") || (extension == "jpeg" || extension == "jpg" || extension == "gif" || extension == "png" || source.substr(0, 10) == "data:image") ),
 			is_url 		= ( (type == "url") || (!is_image && source.substr(0, 4) == "http") ),
-			is_element  = ( (type == "element") || (!is_image && !is_url && $(source).length > 0) ),
+			is_element  = ( (type == "element") || (!is_image && !is_url && source.substr(0, 1) == "#") /* $(source).length > 0) */ ),
 			is_object   = ( (typeof $object !== "undefined") );
 		
 		// Check if one already exists
@@ -104,7 +104,7 @@ if (jQuery) (function($) {
 			if (is_url) {
 				html += ' iframe';
 			}
-			if (is_element) {
+			if (is_element || is_object) {
 				html += ' inline';
 			}
 			html += '" style="opacity: 0;';
@@ -170,6 +170,7 @@ if (jQuery) (function($) {
 				data.$boxer.on("resize.boxer", pub.resize)
 						   .on("close.boxer", _close);
 			}
+			
 			data.$overlay.stop().animate({ opacity: data.options.opacity }, data.options.duration);
 			data.$boxer.stop().animate({ opacity: 1 }, data.options.duration, function() { 
 				if (is_image) {
