@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.6.4
+ * @version 1.6.5
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -22,6 +22,7 @@ if (jQuery) (function($) {
 		minWidth: 200,
 		opacity: 0.75,
 		retina: false,
+		requestKey: "boxer",
 		top: 0,
 		width: 100
 	};
@@ -428,6 +429,7 @@ if (jQuery) (function($) {
 	
 	// Load URL into iFrame
 	function _loadURL(source) {
+		source = source + ((source.indexOf("?") > -1) ? "&"+options.requestKey+"=true" : "?"+options.requestKey+"=true");
 		var $iframe = $('<iframe class="boxer-iframe" src="' + source + '" />');
 		_appendObject($iframe);
 	}
