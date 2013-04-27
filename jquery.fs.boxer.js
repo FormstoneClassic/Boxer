@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.6.5
+ * @version 1.6.6
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -11,11 +11,11 @@ if (jQuery) (function($) {
 	
 	// Default Options
 	var options = {
-		callback: function() {},
+		callback: $.noop,
 		customClass: "",
 		duration: 250,
 		fixed: false,
-		formatter: function() {},
+		formatter: $.noop,
 		height: 100,
 		margin: 100,
 		minHeight: 200,
@@ -24,6 +24,7 @@ if (jQuery) (function($) {
 		retina: false,
 		requestKey: "boxer",
 		top: 0,
+		videoWidth: 600,
 		width: 100
 	};
 	// Internal Data
@@ -40,11 +41,13 @@ if (jQuery) (function($) {
 		
 		resize: function(e, height, width) {
 			if (typeof data.$boxer != "undefined") {
-				
 				if (data.type == "element") {
 					_sizeContent(data.$content.find(">:first-child"));
+				} else if (data.type == "image") {
+					_sizeImage(1);
+				} else if (data.type == "video") {
+					_sizeVideo();
 				}
-				
 				_open();
 			}
 		}
@@ -70,12 +73,13 @@ if (jQuery) (function($) {
 			type = $target.data("type") || "";
 		
 		var is_image    = ( (type == "image") || (extension == "jpeg" || extension == "jpg" || extension == "gif" || extension == "png" || source.substr(0, 10) == "data:image") ),
-			is_url 		= ( (type == "url") || (!is_image && source.substr(0, 4) == "http") ),
-			is_element  = ( (type == "element") || (!is_image && !is_url && source.substr(0, 1) == "#") /* $(source).length > 0) */ ),
+			is_video    = ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 ),
+			is_url 		= ( (type == "url") || (!is_image && !is_video && source.substr(0, 4) == "http") ),
+			is_element  = ( (type == "element") || (!is_image && !is_video && !is_url && source.substr(0, 1) == "#") ),
 			is_object   = ( (typeof $object !== "undefined") );
 		
 		// Check if one already exists
-		if ($("#boxer").length < 1 && (is_image || is_url || is_element || is_object)) {
+		if ($("#boxer").length < 1 && (is_image || is_video || is_url || is_element || is_object)) {
 			// Cache internal data
 			data = {
 				$target: $target,
@@ -83,11 +87,14 @@ if (jQuery) (function($) {
 				gallery: {
 					active: false
 				},
-				options: e.data,
-				type: (is_image) ? "image" : "element"
+				options: e.data
 			};
 			
-			if (is_image) {
+			if (is_image) data.type = "image";
+			else if (is_video) data.type = "video";
+			else data.type = "element";
+			
+			if (is_image || is_video) {
 				// Check for gallery
 				var rel = data.$target.attr("rel");
 				if (typeof rel !== "undefined" && rel !== false) {
@@ -116,7 +123,7 @@ if (jQuery) (function($) {
 			html += '<span class="boxer-close">Close</span>';
 			html += '<div class="boxer-container" style="opacity: 0; height: ' + data.options.height + 'px; width: ' + data.options.width + 'px">';
 			html += '<div class="boxer-content">';
-			if (is_image) {
+			if (is_image || is_video) {
 				html += '<div class="boxer-meta">';
 				
 				if (data.gallery.active) {
@@ -176,7 +183,9 @@ if (jQuery) (function($) {
 			data.$boxer.stop().animate({ opacity: 1 }, data.options.duration, function() { 
 				if (is_image) {
 					_loadImage(source);
-				} else if(is_url) {
+				} else if (is_video) {
+					_loadVideo(source);
+				} else if (is_url) {
 					_loadURL(source);
 				} else if (is_element) {
 					_cloneElement(source);
@@ -280,12 +289,29 @@ if (jQuery) (function($) {
 			if (_sizeImage(0)) {
 				_open();
 			}
-		}).attr("src", source).addClass("boxer-image");
+		}).attr("src", source)
+		  .addClass("boxer-image");
 		
 		// If image has already loaded into cache, trigger load event
 		if (data.$image[0].complete) {
 			data.$image.trigger("load");
 		}
+	}
+	
+	// Load new video
+	function _loadVideo(source) {
+		data.$videoWrapper = $('<div class="boxer-video-wrapper" />');
+		data.$video = $('<iframe class="boxer-video" />');
+		
+		data.$video.attr("src", source)
+				   .addClass("boxer-video")
+				   .prependTo(data.$videoWrapper);
+		
+		data.$content.prepend(data.$videoWrapper);
+		
+		_sizeVideo();
+		
+		_open();
 	}
 	
 	// Format captions
@@ -368,6 +394,22 @@ if (jQuery) (function($) {
 		return true;
 	}
 	
+	// Resize image to fit in viewport
+	function _sizeVideo() {
+		var ratio = 9 / 16;
+		var windowWidth = $(window).width() - data.options.margin - data.padding;
+		var newWidth = (data.options.videoWidth > windowWidth) ? windowWidth : data.options.videoWidth;
+		var newHeight = newWidth * ratio;
+
+		data.$videoWrapper.css({ height: newHeight, width: newWidth });
+		data.$content.css({ width: newWidth });
+		data.$meta.css({ width: newWidth });
+		
+		data.metaHeight = data.$meta.outerHeight(true);
+		data.contentWidth = newWidth;
+		data.contentHeight = newHeight + data.metaHeight;
+	}
+	
 	// Advance gallery
 	function _advanceGallery(e) {
 		e.preventDefault();
@@ -386,13 +428,25 @@ if (jQuery) (function($) {
 			}
 			
 			data.$container.stop().animate({opacity: 0}, data.options.duration, function() {
-				data.$image.remove();
+				if (typeof data.$image !== 'undefined') {
+					data.$image.remove();
+				}
+				if (typeof data.$videoWrapper !== 'undefined') {
+					data.$videoWrapper.remove();
+				}
 				data.$target = data.gallery.$items.eq(data.gallery.index);
 				
 				data.$caption.html(data.options.formatter.apply($("body"), [data.$target]));
 				data.$position.find(".current").html(data.gallery.index + 1);
 				
-				_loadImage(data.$target.attr("href"));
+				var source = data.$target.attr("href"),
+					is_video = ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 );
+				
+				if (is_video) {
+					_loadVideo(source);
+				} else {
+					_loadImage(source);
+				}
 				_updatePagination();
 			});
 		}
