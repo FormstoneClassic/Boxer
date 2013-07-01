@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.6.7
+ * @version 1.6.8
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -67,7 +67,7 @@ if (jQuery) (function($) {
 		// Check target type
 		var $target = $(this),
 			$object = e.data.$object,
-			source = $target.attr("href") || "",
+			source = ($target[0].attributes) ? $target.attr("href") || "" : "",
 			checkExt = source.toLowerCase().split("."),
 			extension = checkExt[ checkExt.length - 1 ],
 			type = $target.data("type") || "";
