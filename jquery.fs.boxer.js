@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.7.0
+ * @version 1.7.1
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -94,7 +94,7 @@ if (jQuery) (function($) {
 					active: false
 				},
 				options: e.data,
-				isMobile: (isMobile && !isUrl && !isElement && !isObject)
+				isMobile: (isMobile /* && !isUrl */ && !isElement && !isObject)
 			};
 			
 			if (isImage) {
@@ -616,28 +616,43 @@ if (jQuery) (function($) {
 	}
 	
 	// Size jQuery object
-	function _sizeContent($obj) {
-		var objHeight = $obj.outerHeight(true),
-			objWidth = $obj.outerWidth(true),
-			windowHeight = $(window).height() - data.options.margin - data.padding,
-			windowWidth = $(window).width() - data.options.margin - data.padding,
-			dataHeight = data.$target.data("height"),
-			dataWidth = data.$target.data("width"),
-			maxHeight = (windowHeight < 0) ? options.minHeight : windowHeight,
-			iframe = $obj.is("iframe");
+	function _sizeContent($object) {
+		data.objectHeight     = $object.outerHeight(true),
+		data.objectWidth      = $object.outerWidth(true),
+		data.windowHeight     = $(window).height() - data.padding,
+		data.windowWidth      = $(window).width() - data.padding,
+		data.dataHeight       = data.$target.data("height"),
+		data.dataWidth        = data.$target.data("width"),
+		data.maxHeight        = (data.windowHeight < 0) ? options.minHeight : data.windowHeight,
+		data.isIframe         = $object.is("iframe");
+		data.objectMarginTop  = 0;
+		data.objectMarginLeft = 0;
+			
+		if (!data.isMobile) {
+			data.windowHeight -= data.options.margin;
+			data.windowWidth  -= data.options.margin;
+		}
 		
-		data.contentHeight = (dataHeight != undefined) ? dataHeight : (iframe) ? windowHeight : objHeight;
-		data.contentWidth = (dataWidth != undefined) ? dataWidth : (iframe) ? windowWidth : objWidth;
+		data.contentHeight = (data.dataHeight != undefined && !data.isIframe) ? data.dataHeight : (data.isIframe) ? data.windowHeight : data.objectHeight;
+		data.contentWidth  = (data.dataWidth != undefined && !data.isIframe)  ? data.dataWidth  : (data.isIframe) ? data.windowWidth  : data.objectWidth;
 		
-		if (data.contentHeight > maxHeight) {
-			data.contentHeight = maxHeight;
-			if (!iframe) {
-				data.$content.css({ overflowY: "scroll" });
+		if (data.contentHeight > data.maxHeight) {
+			data.contentHeight = data.maxHeight;
+			if (!data.isIframe) {
+				data.$content.css({ 
+					overflowY: "scroll" 
+				});
 			}
 		} else {
-			data.$content.css({ overflowY: "auto" });
+			data.$content.css({ 
+				overflowY: "auto" 
+			});
 		}
-		data.$content.css({ height: data.contentHeight, width: data.contentWidth });
+		
+		data.$content.css({ 
+			height: data.contentHeight, 
+			width:  data.contentWidth
+		});
 	}
 	
 	// Define Plugin
