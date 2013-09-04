@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.7.1
+ * @version 1.7.2
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -62,7 +62,7 @@ if (jQuery) (function($) {
 	// Initialize
 	function _init(opts) {
 		options.formatter = _formatCaption;
-		return $(this).on("touchstart.boxer click.boxer", $.extend({}, options, opts || {}), _build);
+		return $(this).on("click.boxer", $.extend({}, options, opts || {}), _build);
 	}
 	
 	// Build Boxer
@@ -187,9 +187,9 @@ if (jQuery) (function($) {
 			// Bind events
 			$(window).on("resize.boxer", _resize)
 					 .on("keydown.boxer", _keypress);
-			$("body").on("touchstart.boxer click.boxer", "#boxer-overlay, #boxer .boxer-close", _close);
+			$("body").on("click.boxer", "#boxer-overlay, #boxer .boxer-close", _close);
 			if (data.gallery.active) {
-				data.$boxer.on("touchstart.boxer click.boxer", ".boxer-arrow", _advanceGallery);
+				data.$boxer.on("click.boxer", ".boxer-arrow", _advanceGallery);
 			}
 			
 			data.$overlay.stop().animate({ opacity: data.options.opacity }, data.options.duration);
