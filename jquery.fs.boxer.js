@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.7.4
+ * @version 1.7.5
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -642,8 +642,8 @@ if (jQuery) (function($) {
 			data.windowWidth  -= data.options.margin;
 		}
 		
-		data.contentHeight = (data.dataHeight != undefined) ? data.dataHeight : /* (data.isIframe) ? data.windowHeight : */ data.objectHeight;
-		data.contentWidth  = (data.dataWidth != undefined)  ? data.dataWidth  : /* (data.isIframe) ? data.windowWidth  : */ data.objectWidth;
+		data.contentHeight = (data.dataHeight != undefined) ? data.dataHeight : (data.isIframe) ? data.windowHeight : data.objectHeight;
+		data.contentWidth  = (data.dataWidth != undefined)  ? data.dataWidth  : (data.isIframe) ? data.windowWidth  : data.objectWidth;
 		
 		if (data.isIframe && data.isMobile) {
 			data.contentHeight = data.windowHeight;
