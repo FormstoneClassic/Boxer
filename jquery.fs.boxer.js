@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.7.2
+ * @version 1.7.4
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -241,6 +241,10 @@ if (jQuery) (function($) {
 			// Fire callback
 			data.options.callback.apply(data.$boxer);
 		});
+		
+		if (data.isMobile) {
+			$("html, body").css({ height: "100%", overflow: "hidden", width: "100%" });
+		}
 	}
 	
 	// Close boxer
@@ -264,6 +268,11 @@ if (jQuery) (function($) {
 			if (data.gallery.active) {
 				data.$boxer.off(".boxer");
 			}
+			
+			if (data.isMobile) {
+				$("html, body").css({ height: "", overflow: "", width: "" });
+			}
+			
 			data = {};
 		}
 	}
@@ -633,20 +642,25 @@ if (jQuery) (function($) {
 			data.windowWidth  -= data.options.margin;
 		}
 		
-		data.contentHeight = (data.dataHeight != undefined && !data.isIframe) ? data.dataHeight : (data.isIframe) ? data.windowHeight : data.objectHeight;
-		data.contentWidth  = (data.dataWidth != undefined && !data.isIframe)  ? data.dataWidth  : (data.isIframe) ? data.windowWidth  : data.objectWidth;
+		data.contentHeight = (data.dataHeight != undefined) ? data.dataHeight : /* (data.isIframe) ? data.windowHeight : */ data.objectHeight;
+		data.contentWidth  = (data.dataWidth != undefined)  ? data.dataWidth  : /* (data.isIframe) ? data.windowWidth  : */ data.objectWidth;
 		
-		if (data.contentHeight > data.maxHeight) {
-			data.contentHeight = data.maxHeight;
-			if (!data.isIframe) {
+		if (data.isIframe && data.isMobile) {
+			data.contentHeight = data.windowHeight;
+			data.contentWidth  = data.windowWidth;
+		}
+		
+		if (!data.isIframe) {
+			if (data.contentHeight > data.maxHeight) {
+				data.contentHeight = data.maxHeight;
 				data.$content.css({ 
 					overflowY: "scroll" 
 				});
+			} else {
+				data.$content.css({ 
+					overflowY: "auto" 
+				});
 			}
-		} else {
-			data.$content.css({ 
-				overflowY: "auto" 
-			});
 		}
 		
 		data.$content.css({ 
