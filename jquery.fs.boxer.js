@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.7.5
+ * @version 1.8.0
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -18,8 +18,9 @@ if (jQuery) (function($) {
 		formatter: $.noop,
 		height: 100,
 		margin: 100,
-		minHeight: 200,
-		minWidth: 200,
+		minHeight: 100,
+		minWidth: 100,
+		mobile: false,
 		opacity: 0.75,
 		retina: false,
 		requestKey: "boxer",
@@ -29,8 +30,7 @@ if (jQuery) (function($) {
 		width: 100
 	};
 	// Internal Data
-	var data = {},
-		resizeTimer = null;
+	var data = {};
 	
 	// Mobile Detect
 	var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test( (navigator.userAgent||navigator.vendor||window.opera) );
@@ -43,16 +43,17 @@ if (jQuery) (function($) {
 			return $(this).off(".boxer");
 		},
 		
-		resize: function(e, height, width) {
+		resize: function(e /* , height, width */) { 
+			// removing custom size support - will return later
 			if (typeof data.$boxer != "undefined") {
 				if (data.type == "element") {
 					_sizeContent(data.$content.find(">:first-child"));
 				} else if (data.type == "image") {
-					_sizeImage(1);
+					_sizeImage(0);
 				} else if (data.type == "video") {
 					_sizeVideo();
 				}
-				_open();
+				_size();
 			}
 			
 			return $(this);
@@ -90,11 +91,14 @@ if (jQuery) (function($) {
 			data = {
 				$target: $target,
 				$object: $object,
+				visible: false,
+				resizeTimer: null,
+				touchTimer: null,
 				gallery: {
 					active: false
 				},
 				options: e.data,
-				isMobile: (isMobile /* && !isUrl */ && !isElement && !isObject)
+				isMobile: ((isMobile || e.data.mobile) /* && !isUrl */ && !isElement && !isObject)
 			};
 			
 			if (isImage) {
@@ -138,8 +142,14 @@ if (jQuery) (function($) {
 			}
 			html += '">';
 			html += '<span class="boxer-close">Close</span>';
-			html += '<div class="boxer-container" style="opacity: 0; height: ' + data.options.height + 'px; width: ' + data.options.width + 'px">';
-			html += '<div class="boxer-content">';
+			html += '<div class="boxer-container" style="'
+			if (data.isMobile) {
+				html += 'height: 100%; width: 100%';
+			} else {
+				html += 'height: ' + data.options.height + 'px; width: ' + data.options.width + 'px';
+			}
+			html += '">';
+			html += '<div class="boxer-content" style="opacity: 0;">';
 			if (isImage || isVideo) {
 				html += '<div class="boxer-meta">';
 				
@@ -233,17 +243,58 @@ if (jQuery) (function($) {
 			});
 		}
 		
-		data.$boxer.stop().animate({ left: newLeft, top: newTop }, data.options.duration);
-		data.$container.show().stop().animate({ height: data.contentHeight, width: data.contentWidth }, data.options.duration, function(e) {
-			data.$container.stop().animate({ opacity: 1 }, data.options.duration);
+		var durration = data.isMobile ? 0 : data.options.duration;
+		
+		//
+		if (!data.visible && data.isMobile) {
+			$("html, body").css({ height: "100%", overflow: "hidden", width: "100%" });
+			
+			if (data.type == "image" && data.gallery.active) {
+				data.$content.on("touchstart.boxer", ".boxer-image", _touchStart);
+			}
+		}
+		
+		data.$boxer.stop().animate({ left: newLeft, top: newTop }, durration);
+		data.$container.show().stop().animate({ height: data.contentHeight, width: data.contentWidth }, durration, function(e) {
+			data.$content.stop().animate({ opacity: 1 }, data.options.duration);
 			data.$boxer.find(".boxer-close").stop().animate({ opacity: 1 }, data.options.duration);
 			
 			// Fire callback
 			data.options.callback.apply(data.$boxer);
+			
+			data.visible = true;
 		});
+	}
+	
+	// Size Boxer
+	function _size(animate) {
+		animate = animate || false;
 		
-		if (data.isMobile) {
-			$("html, body").css({ height: "100%", overflow: "hidden", width: "100%" });
+		if (data.visible) {
+			if (data.isMobile) {
+				var newLeft = 0;
+					newTop = 0;
+			} else {
+				var newLeft = ($(window).width() - data.contentWidth - data.padding) / 2,
+					newTop = (data.options.top <= 0) ? (($(window).height() - data.contentHeight - data.padding) / 2) : data.options.top,
+					arrowHeight = data.$arrows.outerHeight();
+				
+				if (data.options.fixed !== true) {
+					newTop += $(window).scrollTop();
+				}
+				
+				data.$arrows.css({ 
+					marginTop: ((data.contentHeight - data.metaHeight - arrowHeight) / 2) 
+				});
+			}
+			
+			if (animate) {
+				data.$boxer.stop().animate({ left: newLeft, top: newTop }, data.options.duration);
+				data.$container.show().stop().animate({ height: data.contentHeight, width: data.contentWidth });
+			} else {
+				data.$boxer.css({ left: newLeft, top: newTop });
+				data.$container.css({ height: data.contentHeight, width: data.contentWidth });
+			}
 		}
 	}
 	
@@ -259,18 +310,22 @@ if (jQuery) (function($) {
 				$(this).remove();
 			});
 			
-			clearTimeout(resizeTimer);
-			resizeTimer = null;
+			_clearTimer(data.resizeTimer);
 			
 			// Clean up
 			$(window).off(".boxer")
 			$("body").off(".boxer");
+			
 			if (data.gallery.active) {
 				data.$boxer.off(".boxer");
 			}
 			
 			if (data.isMobile) {
 				$("html, body").css({ height: "", overflow: "", width: "" });
+				
+				if (data.type == "image" && data.gallery.active) {
+					data.$container.off(".boxer");
+				}
 			}
 			
 			data = {};
@@ -279,13 +334,8 @@ if (jQuery) (function($) {
 	
 	// Debounce resize events
 	function _resize() {
-		if (!data.isMobile) {
-			if (resizeTimer !== null) {
-				clearTimeout(resizeTimer);
-				resizeTimer = null;
-			}
-			resizeTimer = setTimeout(function() { _center() }, 10);
-		}
+		//data.resizeTimer = _startTimer(data.resizeTimer, 10, function() { pub.resize(); });
+		pub.resize();
 	}
 	
 	// Center boxer on resize
@@ -469,12 +519,12 @@ if (jQuery) (function($) {
 		
 		// MIN
 		if (data.targetImageWidth < data.options.minWidth || data.targetImageHeight < data.options.minHeight) {
-			if (data.imageWidth > data.imageHeight) {
-				data.targetImageHeight = data.options.minHeight;
-				data.targetImageWidth = data.targetImageHeight * data.ratioHorizontal;
-			} else {
+			if (data.targetImageWidth < data.options.minWidth) {
 				data.targetImageWidth = data.options.minWidth;
-				data.targetImageHeight = data.tagretImageWidth * data.ratioVertical;
+				data.targetImageHeight = data.targetImageWidth * data.ratioHorizontal;
+			} else {
+				data.targetImageHeight = data.options.minHeight;
+				data.targetImageWidth = data.targetImageHeight * data.ratioVertical;
 			}
 		}
 		
@@ -556,7 +606,7 @@ if (jQuery) (function($) {
 				data.gallery.index = 0;
 			}
 			
-			data.$container.stop().animate({opacity: 0}, data.options.duration, function() {
+			data.$content.stop().animate({opacity: 0}, data.options.duration, function() {
 				if (typeof data.$image !== 'undefined') {
 					data.$image.remove();
 				}
@@ -668,6 +718,114 @@ if (jQuery) (function($) {
 			width:  data.contentWidth
 		});
 	}
+	
+	
+	
+	// Handle touch start
+	function _touchStart(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		_clearTimer(data.touchTimer);
+		
+		if (!data.isAnimating) {
+			var touch = (typeof e.originalEvent.targetTouches !== "undefined") ? e.originalEvent.targetTouches[0] : null;
+			data.xStart = (touch) ? touch.pageX : e.clientX;
+			data.leftPosition = 0;
+			
+			data.touchMax = Infinity;
+			data.touchMin = -Infinity;
+			data.edge = data.contentWidth * 0.25;
+			
+			if (data.gallery.index == 0) {
+				data.touchMax = 0;
+			}
+			if (data.gallery.index == data.gallery.total) {
+				data.touchMin = 0;
+			}
+			
+			Site.$window.on("touchmove.boxer", _touchMove)
+						.one("touchend.boxer", _touchEnd);
+		}
+	}
+	
+	// Handle touch move
+	function _touchMove(e) {
+		var touch = (typeof e.originalEvent.targetTouches !== "undefined") ? e.originalEvent.targetTouches[0] : null;
+		
+		data.delta = data.xStart - ((touch) ? touch.pageX : e.clientX);
+		
+		// Only prevent event if trying to swipe
+		if (data.delta > 20) {
+			e.preventDefault();
+			e.stopPropagation();
+		}
+		
+		data.canSwipe = true;
+		
+		var newLeft = -data.delta; //data.leftPosition - data.delta;
+		if (newLeft < data.touchMin) {
+			newLeft = data.touchMin;
+			data.canSwipe = false;
+		}
+		if (newLeft > data.touchMax) {
+			newLeft = data.touchMax;
+			data.canSwipe = false;
+		}
+		
+		data.$image.css({ transform: "translate3D("+newLeft+"px,0,0)" });
+		
+		data.touchTimer = _startTimer(data.touchTimer, 300, function() { _touchEnd(e); });
+	}
+	
+	// Handle touch end
+	function _touchEnd(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		_clearTimer(data.touchTimer);
+			
+		Site.$window.off("touchmove.boxer")
+					.off("touchend.boxer");
+		
+		if (data.delta) {
+			data.$boxer.addClass("animated");
+			data.swipe = false;
+			
+			if (data.canSwipe && (data.delta > data.edge || data.delta < -data.edge)) {
+				data.swipe = true;
+				if (data.delta <= data.leftPosition) {
+					data.$image.css({ transform: "translate3D("+(data.contentWidth)+"px,0,0)" });
+				} else {
+					data.$image.css({ transform: "translate3D("+(-data.contentWidth)+"px,0,0)" });
+				}
+			} else {
+				data.$image.css({ transform: "translate3D(0,0,0)" });
+			}
+			
+			if (data.swipe) {
+				data.$arrows.filter( (data.delta <= data.leftPosition) ? ".previous" : ".next" ).trigger("click");
+			}
+			_startTimer(data.resetTimer, data.options.duration, function() { 
+				data.$boxer.removeClass("animated");
+			});
+		}
+	}
+	
+	// Start Timer
+	function _startTimer(timer, time, func) {
+		_clearTimer(timer);
+		return setTimeout(func, time);
+	}
+	
+	// Clear timer
+	function _clearTimer(timer) {
+		if (timer) {
+			clearTimeout(timer);
+			timer = null;
+		}
+	}
+	
 	
 	// Define Plugin
 	$.fn.boxer = function(method) {
