@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.8.0
+ * @version 1.8.1
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -249,6 +249,7 @@ if (jQuery) (function($) {
 		if (!data.visible && data.isMobile) {
 			$("html, body").css({ height: "100%", overflow: "hidden", width: "100%" });
 			
+			console.log(data.type == "image", data.gallery.active);
 			if (data.type == "image" && data.gallery.active) {
 				data.$content.on("touchstart.boxer", ".boxer-image", _touchStart);
 			}
@@ -744,8 +745,8 @@ if (jQuery) (function($) {
 				data.touchMin = 0;
 			}
 			
-			Site.$window.on("touchmove.boxer", _touchMove)
-						.one("touchend.boxer", _touchEnd);
+			$(window).on("touchmove.boxer", _touchMove)
+					 .one("touchend.boxer", _touchEnd);
 		}
 	}
 	
@@ -785,8 +786,8 @@ if (jQuery) (function($) {
 		
 		_clearTimer(data.touchTimer);
 			
-		Site.$window.off("touchmove.boxer")
-					.off("touchend.boxer");
+		$(window).off("touchmove.boxer")
+				 .off("touchend.boxer");
 		
 		if (data.delta) {
 			data.$boxer.addClass("animated");
