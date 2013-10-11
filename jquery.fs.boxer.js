@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.8.1
+ * @version 1.8.3
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -249,7 +249,6 @@ if (jQuery) (function($) {
 		if (!data.visible && data.isMobile) {
 			$("html, body").css({ height: "100%", overflow: "hidden", width: "100%" });
 			
-			console.log(data.type == "image", data.gallery.active);
 			if (data.type == "image" && data.gallery.active) {
 				data.$content.on("touchstart.boxer", ".boxer-image", _touchStart);
 			}
@@ -365,12 +364,14 @@ if (jQuery) (function($) {
 		data.$image = $("<img />");
 		
 		data.$image.one("load.boxer", function() {
-			data.naturalHeight = data.$image[0].naturalHeight;
-			data.naturalWidth = data.$image[0].naturalWidth;
+			var naturalSize = _naturalSize(data.$image);
+			
+			data.naturalHeight = naturalSize.naturalHeight;
+			data.naturalWidth  = naturalSize.naturalWidth;
 			
 			if (data.options.retina) {
 				data.naturalHeight /= 2;
-				data.naturalWidth /= 2;
+				data.naturalWidth  /= 2;
 			}
 			
 			data.$content.prepend(data.$image);
@@ -388,7 +389,7 @@ if (jQuery) (function($) {
 		  .addClass("boxer-image");
 		
 		// If image has already loaded into cache, trigger load event
-		if (data.$image[0].complete) {
+		if (data.$image[0].complete || data.$image[0].readyState === 4) {
 			data.$image.trigger("load");
 		}
 	}
@@ -825,6 +826,27 @@ if (jQuery) (function($) {
 			clearTimeout(timer);
 			timer = null;
 		}
+	}
+	
+	function _naturalSize($img) {
+		var node = $img[0],
+			img = new Image();
+		
+		if (typeof node.naturalHeight != "undefined") {
+			return {
+				naturalHeight: node.naturalHeight,
+				naturalWidth:  node.naturalWidth
+			};
+		} else {
+			if (node.tagName.toLowerCase() === 'img') {
+				img.src = node.src;
+				return {
+					naturalHeight: img.height,
+					naturalWidth:  img.width
+				};
+			}
+		}
+		return false;
 	}
 	
 	
