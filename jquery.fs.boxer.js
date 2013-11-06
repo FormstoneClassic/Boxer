@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.8.5
+ * @version 1.8.6
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -126,7 +126,7 @@ if (jQuery) (function($) {
 			if (!data.isMobile) {
 				html += '<div id="boxer-overlay" class="' + data.options.customClass + '" style="opacity: 0"></div>';
 			}
-			html += '<div id="boxer" class="' + data.options.customClass;
+			html += '<div id="boxer" class="loading ' + data.options.customClass;
 			if (data.isMobile) {
 				html += ' mobile';
 			}
@@ -257,7 +257,8 @@ if (jQuery) (function($) {
 		data.$boxer.stop().animate({ left: newLeft, top: newTop }, durration);
 		data.$container.show().stop().animate({ height: data.contentHeight, width: data.contentWidth }, durration, function(e) {
 			data.$content.stop().animate({ opacity: 1 }, data.options.duration);
-			data.$boxer.find(".boxer-close").stop().animate({ opacity: 1 }, data.options.duration);
+			data.$boxer.removeClass("loading")
+					   .find(".boxer-close").stop().animate({ opacity: 1 }, data.options.duration);
 			
 			// Fire callback
 			data.options.callback.apply(data.$boxer);
@@ -600,6 +601,8 @@ if (jQuery) (function($) {
 		var $arrow = $(this);
 		
 		if (!$arrow.hasClass("disabled")) {
+			data.$boxer.addClass("loading");
+			
 			data.gallery.index += ($arrow.hasClass("next")) ? 1 : -1;
 			if (data.gallery.index > data.gallery.total) {
 				data.gallery.index = data.gallery.total;

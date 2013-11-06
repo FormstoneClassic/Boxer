@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.8.5
+ * @version 1.8.6
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -22,7 +22,7 @@
 	
 	#boxer .boxer-close { background: #fff url(fs-boxer-icons.png) no-repeat -70px 10px; border-radius: 100%; cursor: pointer; display: block; height: 30px; position: absolute; padding: 0; right: -8px; top: -8px; width: 30px; text-indent: -99999px; z-index: 106; }
 	
-	#boxer .boxer-container { background: #fff url(fs-boxer-loading.gif) no-repeat center; height: 100%; overflow: hidden; position: relative; width: 100%; z-index: 105; zoom: 1; }
+	#boxer .boxer-container { background: #fff; height: 100%; overflow: hidden; position: relative; width: 100%; z-index: 105; zoom: 1; }
 	#boxer .boxer-content { background: #fff; overflow: hidden; padding: 0; width: 10000px; }
 	#boxer .boxer-image { float: left; }
 	#boxer .boxer-video { height: 100%; width: 100%; }
@@ -43,10 +43,12 @@
 	#boxer .boxer-caption p { margin: 0; padding: 15px 10px 10px 10px; }
 	#boxer .boxer-caption.gallery p { padding-top: 0; }
 	
+	#boxer.loading .boxer-container { background: #fff url(fs-boxer-loading.gif) no-repeat center; }
+	
 	/* Mobile */
 	#boxer.mobile { background-color: #000; border-radius: 0; height: 100%; left: 0; padding: 30px; position: fixed; top: 0; width: 100%; }
 	#boxer.mobile .boxer-close { background-color: #000; background-position: -70px -60px; border-radius: 0; right: 0; top: 0; }
-	#boxer.mobile .boxer-container { background-color: #000; background-image: url(fs-boxer-loading-dark.gif); }
+	#boxer.mobile .boxer-container { background: #000; }
 	#boxer.mobile .boxer-content { background-color: #000; position: relative; }
 	#boxer.mobile .boxer-arrow { background-color: transparent; border-radius: 0; margin: -20px 0 0; top: 50%; }
 	#boxer.mobile .boxer-arrow.previous { background-position: 0 -40px; float: left; left: 0; }
@@ -76,6 +78,8 @@
 		     -o-transition:      -o-transform 0.25s ease-out !important;
 		        transition: 		transform 0.25s ease-out !important;
 	}
+	
+	#boxer.mobile.loading .boxer-container { background: #000 url(fs-boxer-loading-dark.gif) no-repeat center; }
 	
 	@media screen and (min-width: 980px) { 
 		#boxer .boxer-close:hover { background-position: -70px -20px; }
