@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.8.7
+ * @version 1.8.8
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -37,6 +37,12 @@ if (jQuery) (function($) {
 	
 	// Public Methods
 	var pub = {
+		
+		// Set Defaults
+		defaults: function(opts) {
+			options = $.extend(options, opts || {});
+			return $(this);
+		},
 		
 		destroy: function() {
 			_close();
@@ -868,8 +874,12 @@ if (jQuery) (function($) {
 	};
 	
 	$.boxer = function($target, opts) {
-		return _build($.Event("click", { data: $.extend({
-			$object: $target
-		}, options, opts || {}) }));
+		if (pub[$target]) {
+			return pub[$target].apply(window, Array.prototype.slice.call(arguments, 1));
+		} else {
+			return _build($.Event("click", { data: $.extend({
+				$object: $target
+			}, options, opts || {}) }));
+		}
 	}
 })(jQuery);
