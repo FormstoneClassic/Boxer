@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.8.9
+ * @version 1.9.0
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -17,6 +17,12 @@ if (jQuery) (function($) {
 		fixed: false,
 		formatter: $.noop,
 		height: 100,
+		labels: {
+			close: "Close",
+			count: "of",
+			next: "Next",
+			previous: "Previous"
+		},
 		margin: 100,
 		minHeight: 100,
 		minWidth: 100,
@@ -33,7 +39,7 @@ if (jQuery) (function($) {
 	var data = {};
 	
 	// Mobile Detect
-	var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test( (navigator.userAgent||navigator.vendor||window.opera) );
+	var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test((navigator.userAgent||navigator.vendor||window.opera));
 	
 	// Public Methods
 	var pub = {
@@ -147,7 +153,7 @@ if (jQuery) (function($) {
 				html += ' position: fixed;'
 			}
 			html += '">';
-			html += '<span class="boxer-close">Close</span>';
+			html += '<span class="boxer-close">' + data.options.labels.close + '</span>';
 			html += '<div class="boxer-container" style="'
 			if (data.isMobile) {
 				html += 'height: 100%; width: 100%';
@@ -160,14 +166,14 @@ if (jQuery) (function($) {
 				html += '<div class="boxer-meta">';
 				
 				if (data.gallery.active) {
-					html += '<div class="boxer-arrow previous">Previous</div>';
-					html += '<div class="boxer-arrow next">Next</div>';
+					html += '<div class="boxer-arrow previous">' + data.options.labels.previous + '</div>';
+					html += '<div class="boxer-arrow next">' + data.options.labels.next + '</div>';
 					html += '<p class="boxer-position"';
 					if (data.gallery.total < 1) { 
 						html += ' style="display: none;"'; 
 					}
 					html += '>';
-					html += '<span class="current">' + (data.gallery.index + 1) + '</span> of <span class="total">' + (data.gallery.total + 1) + '</span>';
+					html += '<span class="current">' + (data.gallery.index + 1) + '</span> ' + data.options.labels.count + ' <span class="total">' + (data.gallery.total + 1) + '</span>';
 					html += '</p>';
 					html += '<div class="boxer-caption gallery">';
 				} else {
