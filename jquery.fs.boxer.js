@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.9.0
+ * @version 1.9.1
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -725,11 +725,11 @@ if (jQuery) (function($) {
 			if (data.contentHeight > data.maxHeight) {
 				data.contentHeight = data.maxHeight;
 				data.$content.css({ 
-					overflowY: "scroll" 
+					//overflowY: "scroll" 
 				});
 			} else {
 				data.$content.css({ 
-					overflowY: "auto" 
+					//overflowY: "hidden" 
 				});
 			}
 		}
