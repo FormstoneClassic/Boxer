@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.10.1
+ * @version 1.10.2
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -113,10 +113,6 @@ if (jQuery) (function($) {
 				options: e.data,
 				isMobile: ((trueMobile || e.data.mobile) /* && !isUrl */ && !isElement /* && !isObject */)
 			};
-			
-			if (data.isMobile) {
-				data.options.margin = 0;
-			}
 			
 			if (isImage) {
 				data.type = "image";
@@ -463,8 +459,8 @@ if (jQuery) (function($) {
 			data.containerHeight = data.viewportHeight - data.paddingVertical;
 			data.containerWidth  = data.viewportWidth  - data.paddingHorizontal;
 			
-			data.contentHeight = data.containerHeight - data.options.margin - data.metaHeight;
-			data.contentWidth  = data.containerWidth  - data.options.margin;
+			data.contentHeight = data.containerHeight - data.metaHeight;
+			data.contentWidth  = data.containerWidth;
 			
 			data = _fitImage(data); 
 			
@@ -514,8 +510,8 @@ if (jQuery) (function($) {
 	
 	// Fit image to viewport
 	function _fitImage(data) {
-		var height = (data.isMobile) ? data.contentHeight : data.viewportHeight,
-			width  = (data.isMobile) ? data.contentWidth  : data.viewportWidth;
+		var height = (data.isMobile) ? data.contentHeight - data.options.margin : data.viewportHeight,
+			width  = (data.isMobile) ? data.contentWidth - data.options.margin  : data.viewportWidth;
 		
 		if (data.isWide) {
 			//WIDE
