@@ -1,13 +1,18 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.9.4
+ * @version 1.9.5
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
  */
  
-if (jQuery) (function($) {
+if (jQuery) // ==ClosureCompiler==
+// @output_file_name default.js
+// @compilation_level SIMPLE_OPTIMIZATIONS
+// ==/ClosureCompiler==
+
+(function($) {
 	
 	// Default Options
 	var options = {
@@ -334,6 +339,7 @@ if (jQuery) (function($) {
 			_clearTimer(data.resizeTimer);
 			
 			// Clean up
+			data.$window.off(".boxer");
 			data.$body.off(".boxer")
 					  .removeClass("boxer-open");
 			
