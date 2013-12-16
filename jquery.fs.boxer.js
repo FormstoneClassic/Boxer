@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.9.1
+ * @version 1.9.2
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -257,7 +257,7 @@ if (jQuery) (function($) {
 		
 		var durration = data.isMobile ? 0 : data.options.duration;
 		
-		//
+		// 
 		if (!data.visible && data.isMobile) {
 			$("html, body").css({ height: "100%", overflow: "hidden", width: "100%" });
 			
@@ -272,12 +272,16 @@ if (jQuery) (function($) {
 			data.$boxer.removeClass("loading")
 					   .find(".boxer-close").stop().animate({ opacity: 1 }, data.options.duration);
 			
-			// Fire callback
-			data.options.callback.apply(data.$boxer);
-			
 			data.visible = true;
 			
+			// Fire callback + event
+			data.options.callback.apply(data.$boxer);
 			$(window).trigger("boxer.open");
+			
+			// Start preloading
+			if (data.gallery.active) {
+				_preloadGallery();
+			}
 		});
 	}
 	
@@ -608,6 +612,24 @@ if (jQuery) (function($) {
 		data.contentWidth  = data.videoWidth;
 	}
 	
+	// Preload gallery
+	function _preloadGallery(e) {
+		var source = '';
+		
+		if (data.gallery.index > 0) {
+			source = data.gallery.$items.eq(data.gallery.index - 1).attr("href");
+			if (source.indexOf("youtube.com/embed") < 0 && source.indexOf("player.vimeo.com/video") < 0) {
+				$('<img src="' + source + '">');
+			}
+		}
+		if (data.gallery.index < data.gallery.total) {
+			source = data.gallery.$items.eq(data.gallery.index + 1).attr("href");
+			if (source.indexOf("youtube.com/embed") < 0 && source.indexOf("player.vimeo.com/video") < 0) {
+				$('<img src="' + source + '">');
+			}
+		}
+	}
+	
 	// Advance gallery
 	function _advanceGallery(e) {
 		e.preventDefault();
@@ -627,7 +649,7 @@ if (jQuery) (function($) {
 				data.gallery.index = 0;
 			}
 			
-			data.$content.stop().animate({opacity: 0}, data.options.duration, function() {
+			data.$content.stop().animate({ opacity: 0 }, data.options.duration, function() {
 				if (typeof data.$image !== 'undefined') {
 					data.$image.remove();
 				}

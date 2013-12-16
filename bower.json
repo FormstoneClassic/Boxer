@@ -1,6 +1,6 @@
 {
 	"name": "Boxer",
-	"version": "1.9.1",
+	"version": "1.9.2",
 	"description": "A jQuery plugin for displaying images and content in a modal overlay. Part of the formstone library.",
 	"keywords": [
 		"javascript",
