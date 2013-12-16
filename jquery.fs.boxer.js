@@ -1,7 +1,7 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.9.2
+ * @version 1.9.3
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
@@ -180,15 +180,17 @@ if (jQuery) (function($) {
 					html += '<div class="boxer-caption">';
 				}
 				
-				html += data.options.formatter.apply($("body"), [data.$target]);
+				html += data.options.formatter.apply(data.$body, [data.$target]);
 				html += '</div></div>'; // caption, meta
 			}
 			html += '</div></div></div>'; //container, content, boxer
 			
 			// Modify Dom
-			$("body").append(html);
+			data.$body.append(html);
 			
 			// Cache jquery objects
+			data.$window = $(window);
+			data.$body = $("body");
 			data.$overlay = $("#boxer-overlay");
 			data.$boxer = $("#boxer");
 			data.$container = data.$boxer.find(".boxer-container");
@@ -207,9 +209,9 @@ if (jQuery) (function($) {
 			}
 			
 			// Bind events
-			$(window).on("resize.boxer", _resize)
-					 .on("keydown.boxer", _keypress);
-			$("body").on("click.boxer", "#boxer-overlay, #boxer .boxer-close", _close);
+			data.$window.on("resize.boxer", _resize)
+					 	.on("keydown.boxer", _keypress);
+			data.$body.on("click.boxer", "#boxer-overlay, #boxer .boxer-close", _close);
 			if (data.gallery.active) {
 				data.$boxer.on("click.boxer", ".boxer-arrow", _advanceGallery);
 			}
@@ -242,12 +244,12 @@ if (jQuery) (function($) {
 			var newLeft = 0;
 				newTop = 0;
 		} else {
-			var newLeft = ($(window).width() - data.contentWidth - data.padding) / 2,
-				newTop = (data.options.top <= 0) ? (($(window).height() - data.contentHeight - data.padding) / 2) : data.options.top,
+			var newLeft = (data.$window.width() - data.contentWidth - data.padding) / 2,
+				newTop = (data.options.top <= 0) ? ((data.$window.height() - data.contentHeight - data.padding) / 2) : data.options.top,
 				arrowHeight = data.$arrows.outerHeight();
 			
 			if (data.options.fixed !== true) {
-				newTop += $(window).scrollTop();
+				newTop += data.$window.scrollTop();
 			}
 			
 			data.$arrows.css({ 
@@ -258,12 +260,12 @@ if (jQuery) (function($) {
 		var durration = data.isMobile ? 0 : data.options.duration;
 		
 		// 
-		if (!data.visible && data.isMobile) {
-			$("html, body").css({ height: "100%", overflow: "hidden", width: "100%" });
-			
-			if (data.type == "image" && data.gallery.active) {
-				data.$content.on("touchstart.boxer", ".boxer-image", _touchStart);
-			}
+		if (!data.visible && data.isMobile && data.gallery.active) {
+			data.$content.on("touchstart.boxer", ".boxer-image", _touchStart);
+		}
+		
+		if (data.isMobile || data.options.fixed) {
+			data.$body.addClass("boxer-open");
 		}
 		
 		data.$boxer.stop().animate({ left: newLeft, top: newTop }, durration);
@@ -276,7 +278,7 @@ if (jQuery) (function($) {
 			
 			// Fire callback + event
 			data.options.callback.apply(data.$boxer);
-			$(window).trigger("boxer.open");
+			data.$window.trigger("boxer.open");
 			
 			// Start preloading
 			if (data.gallery.active) {
@@ -294,12 +296,12 @@ if (jQuery) (function($) {
 				var newLeft = 0;
 					newTop = 0;
 			} else {
-				var newLeft = ($(window).width() - data.contentWidth - data.padding) / 2,
-					newTop = (data.options.top <= 0) ? (($(window).height() - data.contentHeight - data.padding) / 2) : data.options.top,
+				var newLeft = (data.$window.width() - data.contentWidth - data.padding) / 2,
+					newTop = (data.options.top <= 0) ? ((data.$window.height() - data.contentHeight - data.padding) / 2) : data.options.top,
 					arrowHeight = data.$arrows.outerHeight();
 				
 				if (data.options.fixed !== true) {
-					newTop += $(window).scrollTop();
+					newTop += data.$window.scrollTop();
 				}
 				
 				data.$arrows.css({ 
@@ -332,16 +334,14 @@ if (jQuery) (function($) {
 			_clearTimer(data.resizeTimer);
 			
 			// Clean up
-			$(window).off(".boxer")
-			$("body").off(".boxer");
+			data.$body.off(".boxer")
+					  .removeClass("boxer-open");
 			
 			if (data.gallery.active) {
 				data.$boxer.off(".boxer");
 			}
 			
 			if (data.isMobile) {
-				$("html, body").css({ height: "", overflow: "", width: "" });
-				
 				if (data.type == "image" && data.gallery.active) {
 					data.$container.off(".boxer");
 				}
@@ -349,7 +349,7 @@ if (jQuery) (function($) {
 			
 			data = {};
 			
-			$(window).trigger("boxer.close");
+			data.$window.trigger("boxer.close");
 		}
 	}
 	
@@ -365,11 +365,11 @@ if (jQuery) (function($) {
 			var newLeft = 0,
 				newTop  = 0;
 		} else {
-			var newLeft = ($(window).width() - data.$boxer.width() - data.padding) / 2,
-				newTop  = (data.options.top <= 0) ? (($(window).height() - data.$boxer.height() - data.padding) / 2) : data.options.top;
+			var newLeft = (data.$window.width() - data.$boxer.width() - data.padding) / 2,
+				newTop  = (data.options.top <= 0) ? ((data.$window.height() - data.$boxer.height() - data.padding) / 2) : data.options.top;
 			
 			if (data.options.fixed !== true) {
-				newTop += $(window).scrollTop();
+				newTop += data.$window.scrollTop();
 			}
 		}
 		
@@ -439,8 +439,8 @@ if (jQuery) (function($) {
 	
 	// Resize image to fit in viewport
 	function _sizeImage(count) {
-		data.windowHeight = data.viewportHeight = (count == 0) ? $(window).height() : data.windowHeight;
-		data.windowWidth  = data.viewportWidth = (count == 0) ? $(window).width() : data.windowWidth;
+		data.windowHeight = data.viewportHeight = (count == 0) ? data.$window.height() : data.windowHeight;
+		data.windowWidth  = data.viewportWidth = (count == 0) ? data.$window.width() : data.windowWidth;
 		
 		data.imageHeight  = (count == 0) ? data.naturalHeight : data.$image.outerHeight();
 		data.imageWidth   = (count == 0) ? data.naturalWidth : data.$image.outerWidth();
@@ -556,8 +556,8 @@ if (jQuery) (function($) {
 	
 	// Resize image to fit in viewport
 	function _sizeVideo() {
-		data.windowHeight = $(window).height() - data.padding;
-		data.windowWidth  = $(window).width() - data.padding;
+		data.windowHeight = data.$window.height() - data.padding;
+		data.windowWidth  = data.$window.width() - data.padding;
 		data.videoMarginTop = 0;
 		data.videoMarginLeft = 0;
 		
@@ -658,7 +658,7 @@ if (jQuery) (function($) {
 				}
 				data.$target = data.gallery.$items.eq(data.gallery.index);
 				
-				data.$caption.html(data.options.formatter.apply($("body"), [data.$target]));
+				data.$caption.html(data.options.formatter.apply(data.$body, [data.$target]));
 				data.$position.find(".current").html(data.gallery.index + 1);
 				
 				var source = data.$target.attr("href"),
@@ -721,8 +721,8 @@ if (jQuery) (function($) {
 	function _sizeContent($object) {
 		data.objectHeight     = $object.outerHeight(true),
 		data.objectWidth      = $object.outerWidth(true),
-		data.windowHeight     = $(window).height() - data.padding,
-		data.windowWidth      = $(window).width() - data.padding,
+		data.windowHeight     = data.$window.height() - data.padding,
+		data.windowWidth      = data.$window.width() - data.padding,
 		data.dataHeight       = data.$target.data("height"),
 		data.dataWidth        = data.$target.data("width"),
 		data.maxHeight        = (data.windowHeight < 0) ? options.minHeight : data.windowHeight,
@@ -787,8 +787,8 @@ if (jQuery) (function($) {
 				data.touchMin = 0;
 			}
 			
-			$(window).on("touchmove.boxer", _touchMove)
-					 .one("touchend.boxer", _touchEnd);
+			data.$window.on("touchmove.boxer", _touchMove)
+					    .one("touchend.boxer", _touchEnd);
 		}
 	}
 	
@@ -828,8 +828,7 @@ if (jQuery) (function($) {
 		
 		_clearTimer(data.touchTimer);
 			
-		$(window).off("touchmove.boxer")
-				 .off("touchend.boxer");
+		data.$window.off("touchmove.boxer touchend.boxer");
 		
 		if (data.delta) {
 			data.$boxer.addClass("animated");
