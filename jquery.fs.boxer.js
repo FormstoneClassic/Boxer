@@ -1,18 +1,13 @@
 /*
  * Boxer [Formstone Library]
  * @author Ben Plum
- * @version 1.9.5
+ * @version 1.10.0
  *
  * Copyright © 2013 Ben Plum <mr@benplum.com>
  * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
  */
  
-if (jQuery) // ==ClosureCompiler==
-// @output_file_name default.js
-// @compilation_level SIMPLE_OPTIMIZATIONS
-// ==/ClosureCompiler==
-
-(function($) {
+if (jQuery) (function($) {
 	
 	// Default Options
 	var options = {
@@ -44,7 +39,7 @@ if (jQuery) // ==ClosureCompiler==
 	var data = {};
 	
 	// Mobile Detect
-	var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test((navigator.userAgent||navigator.vendor||window.opera));
+	var trueMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test((navigator.userAgent||navigator.vendor||window.opera));
 	
 	// Public Methods
 	var pub = {
@@ -85,8 +80,7 @@ if (jQuery) // ==ClosureCompiler==
 	
 	// Build Boxer
 	function _build(e) {
-		e.preventDefault();
-		e.stopPropagation();
+		_killEvent(e);
 		
 		// Check target type
 		var $target = $(this),
@@ -117,8 +111,12 @@ if (jQuery) // ==ClosureCompiler==
 					active: false
 				},
 				options: e.data,
-				isMobile: ((isMobile || e.data.mobile) /* && !isUrl */ && !isElement /* && !isObject */)
+				isMobile: ((trueMobile || e.data.mobile) /* && !isUrl */ && !isElement /* && !isObject */)
 			};
+			
+			if (data.isMobile) {
+				data.options.margin = 0;
+			}
 			
 			if (isImage) {
 				data.type = "image";
@@ -205,7 +203,8 @@ if (jQuery) // ==ClosureCompiler==
 			data.$caption = data.$boxer.find(".boxer-caption");
 			data.$arrows = data.$boxer.find(".boxer-arrow");
 			data.$animatables = $("#boxer-overlay, #boxer, .boxer-container");
-			data.padding = parseInt(data.$boxer.css("paddingTop"), 10) * 2;
+			data.paddingVertical = parseInt(data.$boxer.css("paddingTop"), 10) + parseInt(data.$boxer.css("paddingBottom"), 10);
+			data.paddingHorizontal = parseInt(data.$boxer.css("paddingLeft"), 10) + parseInt(data.$boxer.css("paddingRight"), 10);
 			
 			// Center / update gallery
 			_center();
@@ -214,11 +213,13 @@ if (jQuery) // ==ClosureCompiler==
 			}
 			
 			// Bind events
-			data.$window.on("resize.boxer", _resize)
+			data.$window.on("resize.boxer", pub.resize)
 					 	.on("keydown.boxer", _keypress);
-			data.$body.on("click.boxer", "#boxer-overlay, #boxer .boxer-close", _close);
+			data.$body.on("touchstart.boxer click.boxer", "#boxer-overlay, #boxer .boxer-close", _close)
+					  .on("touchmove.boxer", _killEvent);
+			
 			if (data.gallery.active) {
-				data.$boxer.on("click.boxer", ".boxer-arrow", _advanceGallery);
+				data.$boxer.on("touchstart.boxer click.boxer", ".boxer-arrow", _advanceGallery);
 			}
 			
 			data.$overlay.stop().animate({ opacity: data.options.opacity }, data.options.duration);
@@ -249,8 +250,8 @@ if (jQuery) // ==ClosureCompiler==
 			var newLeft = 0;
 				newTop = 0;
 		} else {
-			var newLeft = (data.$window.width() - data.contentWidth - data.padding) / 2,
-				newTop = (data.options.top <= 0) ? ((data.$window.height() - data.contentHeight - data.padding) / 2) : data.options.top,
+			var newLeft = (data.$window.width() - data.contentWidth - data.paddingHorizontal) / 2,
+				newTop = (data.options.top <= 0) ? ((data.$window.height() - data.contentHeight - data.paddingVertical) / 2) : data.options.top,
 				arrowHeight = data.$arrows.outerHeight();
 			
 			if (data.options.fixed !== true) {
@@ -274,7 +275,7 @@ if (jQuery) // ==ClosureCompiler==
 		}
 		
 		data.$boxer.stop().animate({ left: newLeft, top: newTop }, durration);
-		data.$container.show().stop().animate({ height: data.contentHeight, width: data.contentWidth }, durration, function(e) {
+		data.$container.show().stop().animate({ height: data.containerHeight, width: data.containerWidth }, durration, function(e) {
 			data.$content.stop().animate({ opacity: 1 }, data.options.duration);
 			data.$boxer.removeClass("loading")
 					   .find(".boxer-close").stop().animate({ opacity: 1 }, data.options.duration);
@@ -301,8 +302,8 @@ if (jQuery) // ==ClosureCompiler==
 				var newLeft = 0;
 					newTop = 0;
 			} else {
-				var newLeft = (data.$window.width() - data.contentWidth - data.padding) / 2,
-					newTop = (data.options.top <= 0) ? ((data.$window.height() - data.contentHeight - data.padding) / 2) : data.options.top,
+				var newLeft = (data.$window.width() - data.contentWidth - data.paddingHorizontal) / 2,
+					newTop = (data.options.top <= 0) ? ((data.$window.height() - data.contentHeight - data.paddingVertical) / 2) : data.options.top,
 					arrowHeight = data.$arrows.outerHeight();
 				
 				if (data.options.fixed !== true) {
@@ -316,20 +317,17 @@ if (jQuery) // ==ClosureCompiler==
 			
 			if (animate) {
 				data.$boxer.stop().animate({ left: newLeft, top: newTop }, data.options.duration);
-				data.$container.show().stop().animate({ height: data.contentHeight, width: data.contentWidth });
+				data.$container.show().stop().animate({ height: data.containerHeight, width: data.containerWidth });
 			} else {
 				data.$boxer.css({ left: newLeft, top: newTop });
-				data.$container.css({ height: data.contentHeight, width: data.contentWidth });
+				data.$container.css({ height: data.containerHeight, width: data.containerWidth });
 			}
 		}
 	}
 	
 	// Close boxer
 	function _close(e) {
-		if (e.preventDefault) {
-			e.preventDefault();
-			e.stopPropagation();
-		}
+		_killEvent(e);
 		
 		if (typeof data.$animatables !== "undefined") {
 			data.$animatables.stop().animate({ opacity: 0 }, data.options.duration, function() {
@@ -359,20 +357,14 @@ if (jQuery) // ==ClosureCompiler==
 		}
 	}
 	
-	// Debounce resize events
-	function _resize() {
-		//data.resizeTimer = _startTimer(data.resizeTimer, 10, function() { pub.resize(); });
-		pub.resize();
-	}
-	
 	// Center boxer on resize
 	function _center() {
 		if (data.isMobile) {
 			var newLeft = 0,
 				newTop  = 0;
 		} else {
-			var newLeft = (data.$window.width() - data.$boxer.width() - data.padding) / 2,
-				newTop  = (data.options.top <= 0) ? ((data.$window.height() - data.$boxer.height() - data.padding) / 2) : data.options.top;
+			var newLeft = (data.$window.width() - data.$boxer.width() - data.paddingHorizontal) / 2,
+				newTop  = (data.options.top <= 0) ? ((data.$window.height() - data.$boxer.height() - data.paddingVertical) / 2) : data.options.top;
 			
 			if (data.options.fixed !== true) {
 				newTop += data.$window.scrollTop();
@@ -446,15 +438,15 @@ if (jQuery) // ==ClosureCompiler==
 	// Resize image to fit in viewport
 	function _sizeImage(count) {
 		data.windowHeight = data.viewportHeight = (count == 0) ? data.$window.height() : data.windowHeight;
-		data.windowWidth  = data.viewportWidth = (count == 0) ? data.$window.width() : data.windowWidth;
+		data.windowWidth  = data.viewportWidth  = (count == 0) ? data.$window.width()  : data.windowWidth;
 		
 		data.imageHeight  = (count == 0) ? data.naturalHeight : data.$image.outerHeight();
-		data.imageWidth   = (count == 0) ? data.naturalWidth : data.$image.outerWidth();
+		data.imageWidth   = (count == 0) ? data.naturalWidth  : data.$image.outerWidth();
 		data.metaHeight   = (count == 0) ? 0 : data.metaHeight;
 		
 		if (count == 0) {
 			data.ratioHorizontal = data.imageHeight / data.imageWidth;
-			data.ratioVertical   = data.imageWidth / data.imageHeight;
+			data.ratioVertical   = data.imageWidth  / data.imageHeight;
 			
 			data.isWide = (data.imageWidth > data.imageHeight);
 		}
@@ -468,24 +460,24 @@ if (jQuery) // ==ClosureCompiler==
 		}
 		
 		if (data.isMobile) {
-			data.viewportHeight -= data.padding;
-			data.viewportWidth  -= data.padding;
+			data.containerHeight = data.viewportHeight - data.paddingVertical;
+			data.containerWidth  = data.viewportWidth  - data.paddingHorizontal;
 			
-			data.contentHeight = data.viewportHeight;
-			data.contentWidth  = data.viewportWidth;
+			data.contentHeight = data.containerHeight - data.options.margin - data.metaHeight;
+			data.contentWidth  = data.containerWidth  - data.options.margin;
 			
 			data = _fitImage(data); 
 			
 			data.imageMarginTop  = (data.contentHeight - data.targetImageHeight) / 2;
-			data.imageMarginLeft = (data.contentWidth - data.targetImageWidth) / 2;
+			data.imageMarginLeft = (data.contentWidth  - data.targetImageWidth) / 2;
 		} else {
-			data.viewportHeight -= data.options.margin + data.padding + data.metaHeight;
-			data.viewportWidth  -= data.options.margin + data.padding;
+			data.viewportHeight -= data.options.margin + data.paddingVertical + data.metaHeight;
+			data.viewportWidth  -= data.options.margin + data.paddingHorizontal;
 			
 			data = _fitImage(data);
 			
-			data.contentHeight = data.targetImageHeight;
-			data.contentWidth  = data.targetImageWidth;
+			data.containerHeight = data.contentHeight = data.targetImageHeight;
+			data.containerWidth  = data.contentWidth  = data.targetImageWidth;
 			
 			data.imageMarginTop = 0;
 			data.imageMarginLeft = 0;
@@ -506,13 +498,15 @@ if (jQuery) // ==ClosureCompiler==
 			marginLeft: data.imageMarginLeft
 		});
 		
+		data.metaHeight = data.$meta.outerHeight(true);
+		data.contentHeight += data.metaHeight;
+		
 		if (!data.isMobile) {
-			data.metaHeight = data.$meta.outerHeight(true);
-			data.contentHeight += data.metaHeight;
-			
-			if (data.contentHeight > data.viewportHeight && count < 2) {
-				return _sizeImage(count+1);
-			}
+			data.containerHeight += data.metaHeight;
+		}
+		
+		if (data.contentHeight > data.viewportHeight && count < 2) {
+			return _sizeImage(count+1);
 		}
 		
 		return true;
@@ -520,22 +514,25 @@ if (jQuery) // ==ClosureCompiler==
 	
 	// Fit image to viewport
 	function _fitImage(data) {
+		var height = (data.isMobile) ? data.contentHeight : data.viewportHeight,
+			width  = (data.isMobile) ? data.contentWidth  : data.viewportWidth;
+		
 		if (data.isWide) {
 			//WIDE
-			data.targetImageWidth  = data.viewportWidth;
+			data.targetImageWidth  = width;
 			data.targetImageHeight = data.targetImageWidth * data.ratioHorizontal;
 			
-			if (data.targetImageHeight > data.viewportHeight) {
-				data.targetImageHeight = data.viewportHeight;
+			if (data.targetImageHeight > height) {
+				data.targetImageHeight = height;
 				data.targetImageWidth  = data.targetImageHeight * data.ratioVertical;
 			}
 		} else {
 			//TALL
-			data.targetImageHeight = data.viewportHeight;
+			data.targetImageHeight = height;
 			data.targetImageWidth = data.targetImageHeight * data.ratioVertical;
 			
-			if (data.targetImageWidth > data.viewportWidth) {
-				data.targetImageWidth = data.viewportWidth;
+			if (data.targetImageWidth > width) {
+				data.targetImageWidth = width;
 				data.targetImageHeight = data.targetImageWidth * data.ratioHorizontal;
 			}
 		}
@@ -562,8 +559,8 @@ if (jQuery) // ==ClosureCompiler==
 	
 	// Resize image to fit in viewport
 	function _sizeVideo() {
-		data.windowHeight = data.$window.height() - data.padding;
-		data.windowWidth  = data.$window.width() - data.padding;
+		data.windowHeight = data.$window.height() - data.paddingVertical;
+		data.windowWidth  = data.$window.width()  - data.paddingHorizontal;
 		data.videoMarginTop = 0;
 		data.videoMarginLeft = 0;
 		
@@ -615,7 +612,9 @@ if (jQuery) // ==ClosureCompiler==
 			data.metaHeight = data.$meta.outerHeight(true);
 			data.contentHeight = data.videoHeight + data.metaHeight;
 		}
-		data.contentWidth  = data.videoWidth;
+		
+		data.containerHeight = data.contentHeight;
+		data.containerWidth = data.contentWidth = data.videoWidth;
 	}
 	
 	// Preload gallery
@@ -638,8 +637,7 @@ if (jQuery) // ==ClosureCompiler==
 	
 	// Advance gallery
 	function _advanceGallery(e) {
-		e.preventDefault();
-		e.stopPropagation();
+		_killEvent(e);
 		
 		// Click target
 		var $arrow = $(this);
@@ -694,8 +692,7 @@ if (jQuery) // ==ClosureCompiler==
 	// Handle keypress in gallery
 	function _keypress(e) {
 		if (data.gallery.active && (e.keyCode == 37 || e.keyCode == 39)) {
-			e.preventDefault();
-			e.stopPropagation();
+			_killEvent(e);
 			
 			data.$arrows.filter((e.keyCode == 37) ? ".previous" : ".next").trigger("click");
 		} else if (e.keyCode == 27) {
@@ -727,8 +724,8 @@ if (jQuery) // ==ClosureCompiler==
 	function _sizeContent($object) {
 		data.objectHeight     = $object.outerHeight(true),
 		data.objectWidth      = $object.outerWidth(true),
-		data.windowHeight     = data.$window.height() - data.padding,
-		data.windowWidth      = data.$window.width() - data.padding,
+		data.windowHeight     = data.$window.height() - data.paddingVertical,
+		data.windowWidth      = data.$window.width() - data.paddingHorizontal,
 		data.dataHeight       = data.$target.data("height"),
 		data.dataWidth        = data.$target.data("width"),
 		data.maxHeight        = (data.windowHeight < 0) ? options.minHeight : data.windowHeight,
@@ -749,18 +746,8 @@ if (jQuery) // ==ClosureCompiler==
 			data.contentWidth  = data.windowWidth;
 		}
 		
-		if (!data.isIframe) {
-			if (data.contentHeight > data.maxHeight) {
-				data.contentHeight = data.maxHeight;
-				data.$content.css({ 
-					//overflowY: "scroll" 
-				});
-			} else {
-				data.$content.css({ 
-					//overflowY: "hidden" 
-				});
-			}
-		}
+		data.containerHeight = data.contentHeight;
+		data.containerWidth  = data.contentWidth;
 		
 		data.$content.css({ 
 			height: data.contentHeight, 
@@ -772,9 +759,7 @@ if (jQuery) // ==ClosureCompiler==
 	
 	// Handle touch start
 	function _touchStart(e) {
-		e.preventDefault();
-		e.stopPropagation();
-		
+		_killEvent(e);
 		_clearTimer(data.touchTimer);
 		
 		if (!data.isAnimating) {
@@ -793,8 +778,8 @@ if (jQuery) // ==ClosureCompiler==
 				data.touchMin = 0;
 			}
 			
-			data.$window.on("touchmove.boxer", _touchMove)
-					    .one("touchend.boxer", _touchEnd);
+			data.$boxer.on("touchmove.boxer", _touchMove)
+					   .one("touchend.boxer", _touchEnd);
 		}
 	}
 	
@@ -806,13 +791,12 @@ if (jQuery) // ==ClosureCompiler==
 		
 		// Only prevent event if trying to swipe
 		if (data.delta > 20) {
-			e.preventDefault();
-			e.stopPropagation();
+			_killEvent(e);
 		}
 		
 		data.canSwipe = true;
 		
-		var newLeft = -data.delta; //data.leftPosition - data.delta;
+		var newLeft = -data.delta;
 		if (newLeft < data.touchMin) {
 			newLeft = data.touchMin;
 			data.canSwipe = false;
@@ -829,12 +813,11 @@ if (jQuery) // ==ClosureCompiler==
 	
 	// Handle touch end
 	function _touchEnd(e) {
-		e.preventDefault();
-		e.stopPropagation();
+		_killEvent(e);
 		
 		_clearTimer(data.touchTimer);
 			
-		data.$window.off("touchmove.boxer touchend.boxer");
+		data.$boxer.off("touchmove.boxer touchend.boxer");
 		
 		if (data.delta) {
 			data.$boxer.addClass("animated");
@@ -874,6 +857,7 @@ if (jQuery) // ==ClosureCompiler==
 		}
 	}
 	
+	// Compute natural size
 	function _naturalSize($img) {
 		var node = $img[0],
 			img = new Image();
@@ -893,6 +877,14 @@ if (jQuery) // ==ClosureCompiler==
 			}
 		}
 		return false;
+	}
+	
+	// Kill event
+	function _killEvent(e) {
+		if (e.preventDefault) {
+			e.stopPropagation();
+			e.preventDefault();
+		}
 	}
 	
 	
