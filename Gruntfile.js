@@ -73,7 +73,7 @@ module.exports = function(grunt) {
 					docs: 	  '<%= pkg.homepage %>',
 					demo: 	  '<%= pkg.homepage %>',
 					download: '<%= pkg.repository.url %>',
-					bugs: 	  '<%= pkg.repository.url %>',
+					bugs: 	  '<%= pkg.repository.url %>/issues',
 					dependencies: {
 						jquery: '>=1.7'
 					}
