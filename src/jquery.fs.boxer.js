@@ -1,12 +1,3 @@
-/*
- * Boxer [Formstone Library]
- * @author Ben Plum
- * @version 1.10.2
- *
- * Copyright © 2013 Ben Plum <mr@benplum.com>
- * Released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
- */
- 
 ;(function ($, window) {
 	"use strict";
 	
