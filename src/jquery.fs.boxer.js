@@ -54,6 +54,12 @@
 		width: 100
 	};
 	
+	/**
+	 * @events
+	 * @event open.boxer "Modal opened"
+	 * @event close.boxer "Modal closed"
+	 */
+	
 	var pub = {
 		
 		/**
@@ -61,6 +67,7 @@
 		 * @name defaults
 		 * @description Sets default plugin options
 		 * @param opts [object] <{}> "Options object"
+		 * @example $.boxer("defaults", opts);
 		 */
 		defaults: function(opts) {
 			options = $.extend(options, opts || {});
@@ -71,6 +78,7 @@
 		 * @method 
 		 * @name destroy
 		 * @description Removes instance of plugin
+		 * @example $.boxer("destroy");
 		 */
 		destroy: function() {
 			_onClose();
@@ -81,6 +89,7 @@
 		 * @method 
 		 * @name resize
 		 * @description Triggers resize of instance
+		 * @example $.boxer("resize");
 		 */
 		resize: function(e /* , height, width */) { 
 			// removing custom size support - will return later
@@ -321,7 +330,7 @@
 			
 			// Fire callback + event
 			data.options.callback.apply(data.$boxer);
-			data.$window.trigger("boxer.open");
+			data.$window.trigger("open.boxer");
 			
 			// Start preloading
 			if (data.gallery.active) {
@@ -399,7 +408,7 @@
 				}
 			}
 			
-			data.$window.trigger("boxer.close");
+			data.$window.trigger("close.boxer");
 			
 			data = {};
 		}
