@@ -1,15 +1,48 @@
 /* 
- * Boxer v1.10.2 - 2013-12-23 
+ * Boxer v1.10.4 - 2014-01-03 
  * A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library. 
  * http://www.benplum.com/formstone/boxer/ 
  * 
- * Copyright 2013 Ben Plum; MIT Licensed 
+ * Copyright 2014 Ben Plum; MIT Licensed 
+ */ 
+
+/** 
+ * @plugin 
+ * @name Boxer 
+ * @description A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library. 
+ * @version 1.10.4 
  */ 
 
 ;(function ($, window) {
 	"use strict";
 	
-	// Default Options
+	var data = {},
+		trueMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test((window.navigator.userAgent||window.navigator.vendor||window.opera));
+	
+	/**
+	 * @options
+	 * @param callback [function] <$.noop> "Funciton called after opening instance"
+	 * @param customClass [string] <''> "Class applied to instance"
+	 * @param duration [int] <250> "Animation duration"
+	 * @param fixed [boolean] <false> "Flag for fixed positioning"
+	 * @param formatter [function] <$.noop> "Caption format function"
+	 * @param height [int] <100> "Initial height (while loading)"
+	 * @param labels.close [string] <'Close'> "Close button text"
+	 * @param labels.count [string] <'of'> "Gallery count separator text"
+	 * @param labels.next [string] <'Next'> "Gallery control text"
+	 * @param labels.previous [string] <'Previous'> "Gallery control text"
+	 * @param margin [int] <100> "Margin subtracted when sizing"
+	 * @param minHeight [int] <100> "Minimum height of modal"
+	 * @param minWidth [int] <100> "Minimum width of modal"
+	 * @param mobile [boolean] <false> "Flag to force 'mobile' rendering"
+	 * @param opacity [number] <0.75> "Overlay target opacity"
+	 * @param retina [boolean] <false> "Use 'retina' sizing (half's natural sizes)"
+	 * @param requestKey [string] <'boxer'> "GET variable for ajax / iframe requests"
+	 * @param top [int] <0> "Opacity of overlay"
+	 * @param videoRadio [number] <0.5625> "Video height / width ratio (9 / 16 = 0.5625)"
+	 * @param videoWidth [int] <600> "Video target width"
+	 * @param width [int] <100> "Initial height (while loading)"
+	 */ 
 	var options = {
 		callback: $.noop,
 		customClass: "",
@@ -31,30 +64,39 @@
 		retina: false,
 		requestKey: "boxer",
 		top: 0,
-		videoRatio: 9 / 16,
+		videoRatio: 0.5625,
 		videoWidth: 600,
 		width: 100
 	};
-	// Internal Data
-	var data = {};
 	
-	// Mobile Detect
-	var trueMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test((window.navigator.userAgent||window.navigator.vendor||window.opera));
-	
-	// Public Methods
 	var pub = {
 		
-		// Set Defaults
+		/**
+		 * @method 
+		 * @name defaults
+		 * @description Sets default plugin options
+		 * @param opts [object] <{}> "Options object"
+		 */
 		defaults: function(opts) {
 			options = $.extend(options, opts || {});
 			return $(this);
 		},
 		
+		/**
+		 * @method 
+		 * @name destroy
+		 * @description Removes instance of plugin
+		 */
 		destroy: function() {
-			_close();
+			_onClose();
 			return $(this).off(".boxer");
 		},
 		
+		/**
+		 * @method 
+		 * @name resize
+		 * @description Triggers resize of instance
+		 */
 		resize: function(e /* , height, width */) { 
 			// removing custom size support - will return later
 			if (typeof data.$boxer !== "undefined") {
@@ -72,13 +114,23 @@
 		}
 	};
 	
-	// Initialize
+	/**
+	 * @method private
+	 * @name _init
+	 * @description Initializes plugin
+	 * @param opts [object] "Initialization options"
+	 */
 	function _init(opts) {
 		options.formatter = _formatCaption;
 		return $(this).on("click.boxer", $.extend({}, options, opts || {}), _build);
 	}
 	
-	// Build Boxer
+	/**
+	 * @method private
+	 * @name _build
+	 * @description Builds target instance
+	 * @param e [object] "Event data"
+	 */
 	function _build(e) {
 		_killEvent(e);
 		
@@ -205,13 +257,13 @@
 			// Center / update gallery
 			_center();
 			if (data.gallery.active) {
-				_updatePagination();
+				_updateControls();
 			}
 			
 			// Bind events
 			data.$window.on("resize.boxer", pub.resize)
-						.on("keydown.boxer", _keypress);
-			data.$body.on("touchstart.boxer click.boxer", "#boxer-overlay, #boxer .boxer-close", _close)
+						.on("keydown.boxer", _onKeypress);
+			data.$body.on("touchstart.boxer click.boxer", "#boxer-overlay, #boxer .boxer-close", _onClose)
 					  .on("touchmove.boxer", _killEvent);
 			
 			if (data.gallery.active) {
@@ -240,7 +292,11 @@
 		}
 	}
 	
-	// Open boxer
+	/**
+	 * @method private
+	 * @name _open
+	 * @description Opens active instance
+	 */
 	function _open() {
 		var newLeft = 0,
 			newTop = 0,
@@ -263,7 +319,7 @@
 		
 		// 
 		if (!data.visible && data.isMobile && data.gallery.active) {
-			data.$content.on("touchstart.boxer", ".boxer-image", _touchStart);
+			data.$content.on("touchstart.boxer", ".boxer-image", _onTouchStart);
 		}
 		
 		if (data.isMobile || data.options.fixed) {
@@ -289,7 +345,12 @@
 		});
 	}
 	
-	// Size Boxer
+	/**
+	 * @method private
+	 * @name _size
+	 * @description Sizes active instance
+	 * @param animate [boolean] <false> "Flag to animate sizing"
+	 */
 	function _size(animate) {
 		animate = animate || false;
 		
@@ -322,8 +383,13 @@
 		}
 	}
 	
-	// Close boxer
-	function _close(e) {
+	/**
+	 * @method private
+	 * @name _onClose
+	 * @description Closes active instance
+	 * @param e [object] "Event data"
+	 */
+	function _onClose(e) {
 		_killEvent(e);
 		
 		if (typeof data.$animatables !== "undefined") {
@@ -354,7 +420,11 @@
 		}
 	}
 	
-	// Center boxer on resize
+	/**
+	 * @method private
+	 * @name _center
+	 * @description Centers instance
+	 */
 	function _center() {
 		var newLeft = 0,
 			newTop  = 0;
@@ -374,7 +444,12 @@
 		});
 	}
 	
-	// Load new image
+	/**
+	 * @method private
+	 * @name _loadImage
+	 * @description Loads source image
+	 * @param source [string] "Source image URL"
+	 */
 	function _loadImage(source) {
 		// Cache current image
 		data.$image = $("<img />");
@@ -410,7 +485,12 @@
 		}
 	}
 	
-	// Load new video
+	/**
+	 * @method private
+	 * @name _loadVideo
+	 * @description Loads source video
+	 * @param source [string] "Source video URL"
+	 */
 	function _loadVideo(source) {
 		data.$videoWrapper = $('<div class="boxer-video-wrapper" />');
 		data.$video = $('<iframe class="boxer-video" />');
@@ -426,13 +506,24 @@
 		_open();
 	}
 	
-	// Format caption
+	/**
+	 * @method private
+	 * @name _formatCaption
+	 * @description Formats caption
+	 * @param $target [jQuery object] "Target element"
+	 */
 	function _formatCaption($target) {
 		var title = $target.attr("title");
 		return (title !== "" && title !== undefined) ? '<p class="caption">' + title + '</p>' : "";
 	}
 	
-	// Resize image to fit in viewport
+	/**
+	 * @method private
+	 * @name _sizeImage
+	 * @description Sizes image to fit in viewport
+	 * @param count [int] "Number of resize attempts"
+	 * @return [boolean] "True once sized"
+	 */
 	function _sizeImage(count) {
 		data.windowHeight = data.viewportHeight = (count === 0) ? data.$window.height() : data.windowHeight;
 		data.windowWidth  = data.viewportWidth  = (count === 0) ? data.$window.width()  : data.windowWidth;
@@ -463,7 +554,8 @@
 			data.contentHeight = data.containerHeight - data.metaHeight;
 			data.contentWidth  = data.containerWidth;
 			
-			data = _fitImage(data); 
+			//data = _fitImage(data); 
+			_fitImage(data); 
 			
 			data.imageMarginTop  = (data.contentHeight - data.targetImageHeight) / 2;
 			data.imageMarginLeft = (data.contentWidth  - data.targetImageWidth) / 2;
@@ -471,7 +563,8 @@
 			data.viewportHeight -= data.options.margin + data.paddingVertical + data.metaHeight;
 			data.viewportWidth  -= data.options.margin + data.paddingHorizontal;
 			
-			data = _fitImage(data);
+			//data = _fitImage(data);
+			_fitImage(data); 
 			
 			data.containerHeight = data.contentHeight = data.targetImageHeight;
 			data.containerWidth  = data.contentWidth  = data.targetImageWidth;
@@ -509,8 +602,12 @@
 		return true;
 	}
 	
-	// Fit image to viewport
-	function _fitImage(data) {
+	/**
+	 * @method private
+	 * @name _fitImage
+	 * @description Calculates target image size
+	 */
+	function _fitImage() {
 		var height = (data.isMobile) ? data.contentHeight - data.options.margin : data.viewportHeight,
 			width  = (data.isMobile) ? data.contentWidth - data.options.margin  : data.viewportWidth;
 		
@@ -550,11 +647,13 @@
 				data.targetImageWidth = data.targetImageHeight * data.ratioVertical;
 			}
 		}
-		
-		return data;
 	}
 	
-	// Resize image to fit in viewport
+	/**
+	 * @method private
+	 * @name _sizeVideo
+	 * @description Sizes video to fit in viewport
+	 */
 	function _sizeVideo() {
 		data.windowHeight = data.$window.height() - data.paddingVertical;
 		data.windowWidth  = data.$window.width()  - data.paddingHorizontal;
@@ -614,7 +713,12 @@
 		data.containerWidth = data.contentWidth = data.videoWidth;
 	}
 	
-	// Preload gallery
+	/**
+	 * @method private
+	 * @name _preloadGallery
+	 * @description Preloads previous and next images in gallery for faster rendering
+	 * @param e [object] "Event Data"
+	 */
 	function _preloadGallery(e) {
 		var source = '';
 		
@@ -632,7 +736,12 @@
 		}
 	}
 	
-	// Advance gallery
+	/**
+	 * @method private
+	 * @name _advanceGallery
+	 * @description Advances gallery base on direction
+	 * @param e [object] "Event Data"
+	 */
 	function _advanceGallery(e) {
 		_killEvent(e);
 		
@@ -670,13 +779,17 @@
 				} else {
 					_loadImage(source);
 				}
-				_updatePagination();
+				_updateControls();
 			});
 		}
 	}
 	
-	// Update galery arrows
-	function _updatePagination() {
+	/**
+	 * @method private
+	 * @name _updateControls
+	 * @description Updates gallery control states
+	 */
+	function _updateControls() {
 		data.$arrows.removeClass("disabled");
 		if (data.gallery.index === 0) { 
 			data.$arrows.filter(".previous").addClass("disabled");
@@ -686,8 +799,13 @@
 		}
 	}
 	
-	// Handle keypress in gallery
-	function _keypress(e) {
+	/**
+	 * @method private
+	 * @name _onKeypress
+	 * @description Handles keypress in gallery
+	 * @param e [object] "Event data"
+	 */
+	function _onKeypress(e) {
 		if (data.gallery.active && (e.keyCode === 37 || e.keyCode === 39)) {
 			_killEvent(e);
 			
@@ -697,27 +815,47 @@
 		}
 	}
 	
-	// Clone inline element
+	/**
+	 * @method private
+	 * @name _cloneElement
+	 * @description Clones target inline element
+	 * @param id [string] "Target element id"
+	 */
 	function _cloneElement(id) {
 		var $clone = $(id).find(">:first-child").clone();
 		_appendObject($clone);
 	}
 	
-	// Load URL into iFrame
+	/**
+	 * @method private
+	 * @name _loadURL
+	 * @description Load URL into iframe
+	 * @param source [string] "Target URL"
+	 */
 	function _loadURL(source) {
 		source = source + ((source.indexOf("?") > -1) ? "&"+options.requestKey+"=true" : "?"+options.requestKey+"=true");
 		var $iframe = $('<iframe class="boxer-iframe" src="' + source + '" />');
 		_appendObject($iframe);
 	}
 	
-	// Append jQuery object
-	function _appendObject($obj) {
-		data.$content.append($obj);
-		_sizeContent($obj);
+	/**
+	 * @method private
+	 * @name _appendObject
+	 * @description Appends and sizes object
+	 * @param $object [jQuery Object] "Object to append"
+	 */
+	function _appendObject($object) {
+		data.$content.append($object);
+		_sizeContent($object);
 		_open();
 	}
 	
-	// Size jQuery object
+	/**
+	 * @method private
+	 * @name _sizeContent
+	 * @description Sizes jQuery object to fir in viewport
+	 * @param $object [jQuery Object] "Object to size"
+	 */
 	function _sizeContent($object) {
 		data.objectHeight     = $object.outerHeight(true);
 		data.objectWidth      = $object.outerWidth(true);
@@ -752,10 +890,13 @@
 		});
 	}
 	
-	
-	
-	// Handle touch start
-	function _touchStart(e) {
+	/**
+	 * @method private
+	 * @name _onTouchStart
+	 * @description Handle touch start event
+	 * @param e [object] "Event data"
+	 */
+	function _onTouchStart(e) {
 		_killEvent(e);
 		_clearTimer(data.touchTimer);
 		
@@ -775,13 +916,18 @@
 				data.touchMin = 0;
 			}
 			
-			data.$boxer.on("touchmove.boxer", _touchMove)
-					   .one("touchend.boxer", _touchEnd);
+			data.$boxer.on("touchmove.boxer", _onTouchMove)
+					   .one("touchend.boxer", _onTouchEnd);
 		}
 	}
 	
-	// Handle touch move
-	function _touchMove(e) {
+	/**
+	 * @method private
+	 * @name _onTouchMove
+	 * @description Handles touchmove event
+	 * @param e [object] "Event data"
+	 */
+	function _onTouchMove(e) {
 		var touch = (typeof e.originalEvent.targetTouches !== "undefined") ? e.originalEvent.targetTouches[0] : null;
 		
 		data.delta = data.xStart - ((touch) ? touch.pageX : e.clientX);
@@ -805,11 +951,16 @@
 		
 		data.$image.css({ transform: "translate3D("+newLeft+"px,0,0)" });
 		
-		data.touchTimer = _startTimer(data.touchTimer, 300, function() { _touchEnd(e); });
+		data.touchTimer = _startTimer(data.touchTimer, 300, function() { _onTouchEnd(e); });
 	}
 	
-	// Handle touch end
-	function _touchEnd(e) {
+	/**
+	 * @method private
+	 * @name _onTouchEnd
+	 * @description Handles touchend event
+	 * @param e [object] "Event data"
+	 */
+	function _onTouchEnd(e) {
 		_killEvent(e);
 		
 		_clearTimer(data.touchTimer);
@@ -840,13 +991,25 @@
 		}
 	}
 	
-	// Start Timer
-	function _startTimer(timer, time, func) {
+	/**
+	 * @method private
+	 * @name _startTimer
+	 * @description Starts an internal timer
+	 * @param timer [int] "Timer ID"
+	 * @param time [int] "Time until execution"
+	 * @param callback [int] "Function to execute"
+	 */
+	function _startTimer(timer, time, callback) {
 		_clearTimer(timer);
-		return setTimeout(func, time);
+		return setTimeout(callback, time);
 	}
 	
-	// Clear timer
+	/**
+	 * @method private
+	 * @name _clearTimer
+	 * @description Clears an internal timer
+	 * @param timer [int] "Timer ID"
+	 */
 	function _clearTimer(timer) {
 		if (timer) {
 			clearTimeout(timer);
@@ -854,7 +1017,13 @@
 		}
 	}
 	
-	// Compute natural size
+	/**
+	 * @method private
+	 * @name _naturalSize
+	 * @description Determines natural size of target image
+	 * @param $img [jQuery object] "Source image object"
+	 * @return [object | boolean] "Object containing natural height and width values or false"
+	 */
 	function _naturalSize($img) {
 		var node = $img[0],
 			img = new Image();
@@ -876,7 +1045,12 @@
 		return false;
 	}
 	
-	// Kill event
+	/**
+	 * @method private
+	 * @name _killEvent
+	 * @description Prevents default and stops propagation on event
+	 * @param e [object] "Event data"
+	 */
 	function _killEvent(e) {
 		if (e.preventDefault) {
 			e.stopPropagation();
@@ -884,8 +1058,6 @@
 		}
 	}
 	
-	
-	// Define Plugin
 	$.fn.boxer = function(method) {
 		if (pub[method]) {
 			return pub[method].apply(this, Array.prototype.slice.call(arguments, 1));
@@ -899,9 +1071,9 @@
 		if (pub[$target]) {
 			return pub[$target].apply(window, Array.prototype.slice.call(arguments, 1));
 		} else {
-			return _build($.Event("click", { data: $.extend({
+			return _build.apply(window, [ $.Event("click", { data: $.extend({
 				$object: $target
-			}, options, opts || {}) }));
+			}, options, opts || {}) })] );
 		}
 	};
 })(jQuery, window);
