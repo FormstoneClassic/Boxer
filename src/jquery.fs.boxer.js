@@ -535,7 +535,6 @@
 	 * @name _sizeImage
 	 * @description Sizes image to fit in viewport
 	 * @param count [int] "Number of resize attempts"
-	 * @return [boolean] "True, once sized"
 	 */
 	function _sizeImage() {
 		var count = 0;
@@ -1090,6 +1089,7 @@
 				};
 			}
 		}
+		
 		return false;
 	}
 	
