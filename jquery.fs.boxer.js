@@ -53,7 +53,7 @@
 	 * @param opacity [number] <0.75> "Overlay target opacity"
 	 * @param retina [boolean] <false> "Use 'retina' sizing (half's natural sizes)"
 	 * @param requestKey [string] <'boxer'> "GET variable for ajax / iframe requests"
-	 * @param top [int] <0> "Opacity of overlay"
+	 * @param top [int] <0> "Target top position; over-rides centering"
 	 * @param videoRadio [number] <0.5625> "Video height / width ratio (9 / 16 = 0.5625)"
 	 * @param videoWidth [int] <600> "Video target width"
 	 * @param width [int] <100> "Initial height (while loading)"
@@ -86,8 +86,8 @@
 	
 	/**
 	 * @events
-	 * @event open.boxer "Modal opened"
-	 * @event close.boxer "Modal closed"
+	 * @event open.boxer "Modal opened; triggered on window"
+	 * @event close.boxer "Modal closed; triggered on window"
 	 */
 	
 	var pub = {
