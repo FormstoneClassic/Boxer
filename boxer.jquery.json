@@ -1,6 +1,6 @@
 {
   "name": "boxer",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "title": "Boxer",
   "author": {
     "name": "Ben Plum",
@@ -22,6 +22,8 @@
     "modal",
     "slideshow",
     "ui",
+    "javascript",
+    "jquery",
     "formstone",
     "benplum"
   ],
