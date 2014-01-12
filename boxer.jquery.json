@@ -1,6 +1,6 @@
 {
   "name": "boxer",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "title": "Boxer",
   "author": {
     "name": "Ben Plum",
@@ -16,7 +16,6 @@
   "dependencies": {
     "jquery": ">=1.7"
   },
-  "homepage": "http://formstone.it/boxer/",
   "description": "A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library.",
   "keywords": [
     "modal",
@@ -30,5 +29,6 @@
   "docs": "http://formstone.it/boxer/",
   "demo": "http://formstone.it/boxer/",
   "download": "https://github.com/benplum/Boxer",
-  "bugs": "https://github.com/benplum/Boxer/issues"
+  "bugs": "https://github.com/benplum/Boxer/issues",
+  "homepage": "http://formstone.it/boxer/"
 }
