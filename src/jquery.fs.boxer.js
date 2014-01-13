@@ -1,18 +1,3 @@
-/*
- * Boxer v3.0.0 - 2014-01-04
- * A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library.
- * http://formstone.it/boxer/
- *
- * Copyright 2014 Ben Plum; MIT Licensed
- */
-
-/**
- * @plugin
- * @name Boxer
- * @description A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library.
- * @version 3.0.0
- */
-
 ;(function ($, window) {
 	"use strict";
 
