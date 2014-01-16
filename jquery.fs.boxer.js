@@ -1,5 +1,5 @@
 /* 
- * Boxer v3.0.3 - 2014-01-13 
+ * Boxer v3.0.4 - 2014-01-15 
  * A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library. 
  * http://formstone.it/boxer/ 
  * 
@@ -98,10 +98,16 @@
 		 * @name resize
 		 * @description Triggers resize of instance
 		 * @example $.boxer("resize");
+		 * @param height [int | false] "Target height or false to auto size"
+		 * @param width [int | false] "Target width or false to auto size"
 		 */
-		resize: function(e /* , height, width */) {
-			// removing custom size support - will return later
+		resize: function(e) {
 			if (typeof data.$boxer !== "undefined") {
+				if (typeof e !== "object") {
+					data.targetHeight = arguments[0];
+					data.targetWidth  = arguments[1];
+				}
+
 				if (data.type === "element") {
 					_sizeContent(data.$content.find(">:first-child"));
 				} else if (data.type === "image") {
@@ -895,12 +901,12 @@
 	 * @param $object [jQuery Object] "Object to size"
 	 */
 	function _sizeContent($object) {
-		data.objectHeight     = $object.outerHeight(true);
-		data.objectWidth      = $object.outerWidth(true);
 		data.windowHeight     = data.$window.height() - data.paddingVertical;
 		data.windowWidth      = data.$window.width() - data.paddingHorizontal;
-		//data.dataHeight       = data.$target.data("height");
-		//data.dataWidth        = data.$target.data("width");
+		data.objectHeight     = $object.outerHeight(true);
+		data.objectWidth      = $object.outerWidth(true);
+		data.targetHeight     = data.targetHeight || data.$target.data("boxer-height");
+		data.targetWidth      = data.targetWidth  || data.$target.data("boxer-width");
 		data.maxHeight        = (data.windowHeight < 0) ? options.minHeight : data.windowHeight;
 		data.isIframe         = $object.is("iframe");
 		data.objectMarginTop  = 0;
@@ -911,14 +917,18 @@
 			data.windowWidth  -= data.margin;
 		}
 
-		data.contentHeight = (data.dataHeight !== undefined) ? data.dataHeight : (data.isIframe) ? data.windowHeight : data.objectHeight;
-		data.contentWidth  = (data.dataWidth !== undefined)  ? data.dataWidth  : (data.isIframe) ? data.windowWidth  : data.objectWidth;
+		data.contentHeight = (data.targetHeight !== undefined) ? data.targetHeight : (data.isIframe) ? data.windowHeight : data.objectHeight;
+		data.contentWidth  = (data.targetWidth !== undefined)  ? data.targetWidth  : (data.isIframe) ? data.windowWidth  : data.objectWidth;
 
 		if (data.isIframe && data.isMobile) {
 			data.contentHeight = data.windowHeight;
 			data.contentWidth  = data.windowWidth;
 		}
 
+		_setContentSize(data);
+	}
+
+	function _setContentSize(data) {
 		data.containerHeight = data.contentHeight;
 		data.containerWidth  = data.contentWidth;
 
@@ -1031,32 +1041,6 @@
 
 	/**
 	 * @method private
-	 * @name _startTimer
-	 * @description Starts an internal timer
-	 * @param timer [int] "Timer ID"
-	 * @param time [int] "Time until execution"
-	 * @param callback [int] "Function to execute"
-	 */
-	function _startTimer(timer, time, callback) {
-		_clearTimer(timer);
-		return setTimeout(callback, time);
-	}
-
-	/**
-	 * @method private
-	 * @name _clearTimer
-	 * @description Clears an internal timer
-	 * @param timer [int] "Timer ID"
-	 */
-	function _clearTimer(timer) {
-		if (timer) {
-			clearTimeout(timer);
-			timer = null;
-		}
-	}
-
-	/**
-	 * @method private
 	 * @name _naturalSize
 	 * @description Determines natural size of target image
 	 * @param $img [jQuery object] "Source image object"
@@ -1094,6 +1078,32 @@
 		if (e.preventDefault) {
 			e.stopPropagation();
 			e.preventDefault();
+		}
+	}
+
+	/**
+	 * @method private
+	 * @name _startTimer
+	 * @description Starts an internal timer
+	 * @param timer [int] "Timer ID"
+	 * @param time [int] "Time until execution"
+	 * @param callback [int] "Function to execute"
+	 */
+	function _startTimer(timer, time, callback) {
+		_clearTimer(timer);
+		return setTimeout(callback, time);
+	}
+
+	/**
+	 * @method private
+	 * @name _clearTimer
+	 * @description Clears an internal timer
+	 * @param timer [int] "Timer ID"
+	 */
+	function _clearTimer(timer) {
+		if (timer) {
+			clearTimeout(timer);
+			timer = null;
 		}
 	}
 

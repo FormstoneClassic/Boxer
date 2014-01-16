@@ -3,59 +3,59 @@
 	<head>
 		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    	
+
 		<title>Boxer Demo</title>
-		
+
 		<link href="http://formstone.it/css/demo.css" rel="stylesheet" type="text/css" media="all" />
-		
+
 		<!--[if LTE IE 8]>
 			<link href="http://formstone.it/css/demo.ie.css" rel="stylesheet" type="text/css" media="all" />
 		<![endif]-->
-		
+
 		<script src="http://formstone.it/js/demo.js"></script>
-		
+
 		<link href="../jquery.fs.boxer.css" rel="stylesheet" type="text/css" media="all" />
-		<script src="../jquery.fs.boxer.js"></script>
-		
+		<script src="../src/jquery.fs.boxer.js"></script>
+
 		<style>
 			.boxer { border: none; }
 			.inline_content { width: 300px; overflow: hidden; }
 			#boxer h3 { font-style: italic; font-size: 16px; padding: 15px 10px 10px; }
 		</style>
-		
+
 		<script>
 			$(document).ready(function() {
 				$(".boxer").not(".retina, .boxer_fixed, .boxer_top, .boxer_format, .boxer_mobile, .boxer_object").boxer();
-				
+
 				$(".boxer.boxer_fixed").boxer({
 					fixed: true
 				});
-				
+
 				$(".boxer.boxer_top").boxer({
 					top: 50
 				});
-				
+
 				$(".boxer.retina").boxer({
 					retina: true
 				});
-				
+
 				$(".boxer.boxer_format").boxer({
 					formatter: function($target) {
 						return '<h3>' + $target.attr("title") + "</h3>";
 					}
 				});
-				
+
 				$(".boxer.boxer_object").click(function(e) {
 					e.preventDefault();
 					e.stopPropagation();
-					
+
 					$.boxer( $('<div class="inline_content"><h2>More Content!</h2><p>This was created by jQuery and loaded into the new Boxer instance.</p></div>') );
 				});
-				
+
 				$(".boxer.boxer_mobile").boxer({
 					mobile: true
 				});
-				
+
 				/*
 				$("body").on("click", ".resize_modal", function() {
 					$("#boxer").trigger("resize", [500, 500]);
@@ -84,36 +84,36 @@
 					<br />
 					<a href="http://formstone.it/boxer/" class="button">View Documentation</a>
 				</header>
-				
+
 				<!-- Basic -->
 				<h2>Basic</h2>
 				<p>To display a single image simply link to the source. Also, 'title' attributes will automatically populate the caption field:</p>
-				
+
 				<pre class="example"><code class="language-javascript">$(".boxer").boxer();</code></pre>
 				<pre class="example"><code class="language-markup">&lt;a href="image.jpg" class="boxer" title="Caption"&gt;
 	&lt;img src="thumbnail.jpg" alt="Thumbnail" /&gt;
 &lt;/a&gt;</code></pre>
-				
+
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
 						<img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;" />
 					</a>
 				</div>
-				
+
 				<br />
-				
+
 				<!-- Gallery -->
 				<h2>Gallery</h2>
 				<p>To display a gallery of images attach a common 'rel' attribute to each item:</p>
-				
+
 				<pre class="example"><code class="language-markup">&lt;a href="image_1.jpg" class="boxer" title="Caption One" rel="gallery"&gt;
     &lt;img src="thumbnail_1.jpg" alt="Thumbnail One" /&gt;
 &lt;/a&gt;
 &lt;a href="image_2.jpg" class="boxer" title="Caption Two" rel="gallery"&gt;
     &lt;img src="thumbnail_2.jpg" alt="Thumbnail Two" /&gt;
 &lt;/a&gt;</code></pre>
-				
+
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image" rel="gallery" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
@@ -126,17 +126,17 @@
 					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;" />
 					</a>
 				</div>
-				
+
 				<br />
-				
+
 				<!-- YouTube & Vimeo -->
 				<h2>YouTube &amp; Vimeo Videos</h2>
 				<p>Boxer will auto-detect a YouTube or Vimeo embed URL and render accordingly. Videos can also be included in galleries alongside image.</p>
-				
+
 				<pre class="example"><code class="language-markup">&lt;a href="http://www.youtube.com/embed/VIDEO_ID" rel="videos" title=""&gt;YouTube Video&lt;/a&gt;
 // OR
 &lt;a href="http://player.vimeo.com/video/VIDEO_ID" rel="videos" title=""&gt;Vimeo Video&lt;/a&gt;</code></pre>
-				
+
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://www.youtube.com/embed/zsJpUCWfyPE?rel=0" class="boxer button small" rel="video_gallery" title="STS-129 HD Launch">
@@ -146,17 +146,17 @@
 						Vimeo Video
 					</a>
 				</div>
-				
+
 				<br />
-				
+
 				<!-- Mobile -->
 				<h2>Mobile</h2>
 				<p>Boxer will automatically render a touch-friendly modal on mobile devices, but you can also force it to always render as mobile:</p>
-				
+
 				<pre class="example"><code class="language-javascript">$(".boxer").boxer({
     mobile: true
 });</code></pre>
-				
+
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image boxer_mobile" rel="gallery_mobile" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
@@ -169,17 +169,17 @@
 					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;" />
 					</a>
 				</div>
-				
+
 				<br />
-				
+
 				<!-- FIXED -->
 				<h2>Fixed Positioning</h2>
 				<p>To display a more traditional lightbox that locks the window while open:</p>
-				
+
 				<pre class="example"><code class="language-javascript">$(".boxer").boxer({
     fixed: true
 });</code></pre>
-				
+
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image boxer_fixed" rel="gallery_fixed" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
@@ -192,17 +192,17 @@
 					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;" />
 					</a>
 				</div>
-				
+
 				<br />
-				
+
 				<!-- Top -->
 				<h2>Top Positioning</h2>
 				<p>To force the modal to always animate from a standard top position:</p>
-				
+
 				<pre class="example"><code class="language-javascript">$(".boxer").boxer({
     top: 50
 });</code></pre>
-				
+
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image boxer_top" rel="gallery_top" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
@@ -215,20 +215,20 @@
 					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;" />
 					</a>
 				</div>
-				
+
 				<br />
-				
+
 				<!-- IN-LINE CONTENT -->
 				<h2>In-Line Content</h2>
 				<p>To display a section of inline markup link to the parent element's 'id'. It's important to note that a copy of the matching element's inner markup will be used, so try to avoid using decent elements with id selectors:</p>
-				
+
 				<pre class="example"><code class="language-markup">&lt;a href="#hidden" class="boxer"&gt;Show Content&lt;/a&gt;
 &lt;div id="hidden" style="display: none;"&gt;
     &lt;div class="content"&gt;
         ...
     &lt;/div&gt;
 &lt;/div&gt;</code></pre>
-				
+
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="#hidden_content" class="boxer button small">Show Hidden Content</a>
@@ -243,58 +243,56 @@
 						-->
 					</div>
 				</div>
-				
+
 				<br />
-				
+
 				<!-- jQUERY OBJECTS -->
 				<h2>jQuery Objects</h2>
 				<p>You can also display compiled jQuery objects, this is especially usefull when loading partial content or using a templating system. To display a pre-compiled jQuery object, simply pass the new object when calling the plugin.</p>
-				
+
 				<pre class="example"><code class="language-javascript">$obj = $("<div><h2>Content!</h2></div>");
 // OR
 $obj = $("&lt;div /&gt;").load("http://www.url.com/partial-markup/");
 
 $.boxer($obj);</code></pre>
-				
+
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="#" class="boxer boxer_object button small">Show jQuery Object</a>
 				</div>
-				
+
 				<br />
-				
+
 				<!-- iFRAME -->
 				<h2>iFrame</h2>
 				<p>To display a valid URL in an iFrame simply link to the page:</p>
-				
-				<pre class="example"><code class="language-markup">&lt;a href="http://www.example.com/" class="boxer"&gt;Example&lt;/a&gt;</code></pre>
-				
+
+				<pre class="example"><code class="language-markup">&lt;a href="http://www.example.com/" class="boxer" data-boxer-height="200" data-boxer-width="400"&gt;Example&lt;/a&gt;</code></pre>
+
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://www.cnn.com/" class="boxer button small">View CNN.com</a>
 				</div>
-				
+
 				<br />
-				
+
 				<!-- CUSTOM SIZE -->
-				<!--
-				<h2>Custom Sizing</h2>
-				<p>When loading inline content, a jQuery object or an iFramed URL you can specify the desired dimentions using html data attributes. If no dimentions are specified, the plugin will calculate them based on window and content size:</p>
-				
+				<h2>Sizing</h2>
+				<p>When loading inline content or an iFramed URL you can specify the desired dimensions using html data attributes. If no dimensions are specified, or mobile styles are being rendered, the plugin will calculate them based on the current window and content size:</p>
+
 				<pre class="example"><code class="language-markup">&lt;a href="http://www.example.com/" class="boxer" data-height="500" data-width="500"&gt;Example&lt;/a&gt;</code></pre>
-				
+
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="http://www.cnn.com/" class="boxer button small" data-height="500" data-width="500">View CNN.com</a>
+					<a href="http://www.cnn.com/" class="boxer button small" data-boxer-height="500" data-boxer-width="500">View CNN.com</a>
 				</div>
-				
+
 				<br />
-				-->
-				
+
 				<!-- CAPTION FORMATTING -->
 				<h2>Caption Formating</h2>
 				<p>To customize the caption markup:</p>
-				
+
 				<pre class="example"><code class="language-javascript">$(".boxer").boxer({
     formatter: formatCaptions
 });
@@ -302,38 +300,38 @@ $.boxer($obj);</code></pre>
 function formatCaptions($target) {
 	return '&lt;h3&gt;' + $target.attr("title") + '&lt;/h3&gt;';
 }</code></pre>
-				
+
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image boxer_format" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
 					    <img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;" />
 					</a>
 				</div>
-				
+
 				<br />
-				
+
 				<!-- RETINA -->
 				<h2>Retina Support</h2>
 				<p>To display images at "retina" quality the original image dimentions of halved, sizing the images to at least 2x pixel-density and ensuring crisp images on your fancy new display.</p>
-				
+
 				<pre class="example"><code class="language-javascript">$(".boxer").boxer({
     retina: true
 });</code></pre>
-				
+
 				<pre class="example"><code class="language-markup">&lt;a href="image-2x.jpg" class="boxer" title="Caption - Retina"&gt;
     &lt;img src="thumbnail-2x.jpg" alt="Thumbnail - Retina" /&gt;
 &lt;/a&gt;</code></pre>
-				
+
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-retina.jpg" class="boxer boxer_image retina" title="By Apollo 15 astronaut.Bubba73 at en.wikipedia [Public domain], from Wikimedia Commons">
 						<img src="http://formstone.it/files/demo/nasa-bw-retina.jpg" alt="" style="height: 100px;" />
 					</a>
 				</div>
-				
+
 			</div>
 		</article>
-		
+
 		<footer id="footer" class="row">
 			<div class="all-full copyright">
 				Made with &hearts; in Hampden
