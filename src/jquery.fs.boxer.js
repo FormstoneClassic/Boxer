@@ -139,9 +139,9 @@
 			checkExt = source.toLowerCase().split("."),
 			extension = checkExt[ checkExt.length - 1 ],
 			type = '', // $target.data("type") || "";
-			isImage    = ( (type === "image") || (extension === "jpeg" || extension === "jpg" || extension === "gif" || extension === "png" || source.substr(0, 10) === "data:image") ),
-			isVideo    = ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 ),
-			isUrl      = ( (type === "url") || (!isImage && !isVideo && source.substr(0, 4) === "http") ),
+			isImage	= ( (type === "image") || (extension === "jpeg" || extension === "jpg" || extension === "gif" || extension === "png" || source.substr(0, 10) === "data:image") ),
+			isVideo	= ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 ),
+			isUrl	  = ( (type === "url") || (!isImage && !isVideo && source.substr(0, 4) === "http") ),
 			isElement  = ( (type === "element") || (!isImage && !isVideo && !isUrl && source.substr(0, 1) === "#") ),
 			isObject   = ( (typeof $object !== "undefined") );
 
@@ -349,7 +349,7 @@
 		if (!data.isMobile) {
 			arrowHeight = data.$arrows.outerHeight();
 			data.$arrows.css({
-				marginTop: ((data.contentHeight - data.metaHeight - arrowHeight) / 2)
+				marginTop: ((data.contentHeight - arrowHeight) / 2)
 			});
 		}
 
@@ -406,7 +406,7 @@
 			if (!data.isMobile) {
 				arrowHeight = data.$arrows.outerHeight();
 				data.$arrows.css({
-					marginTop: ((data.contentHeight - data.metaHeight - arrowHeight) / 2)
+					marginTop: ((data.contentHeight - arrowHeight) / 2)
 				});
 			}
 
@@ -528,8 +528,8 @@
 	function _sizeImage() {
 		var count = 0;
 
-		data.windowHeight = data.viewportHeight = data.$window[0].innerHeight;
-		data.windowWidth  = data.viewportWidth  = data.$window[0].innerWidth;
+		data.windowHeight = data.viewportHeight = data.$window.height();
+		data.windowWidth  = data.viewportWidth  = data.$window.width();
 
 		data.containerHeight = Infinity;
 		data.contentHeight = 0;
@@ -690,8 +690,8 @@
 	 */
 	function _sizeVideo() {
 		// Set initial vars
-		data.windowHeight = data.viewportHeight = data.contentHeight = data.$window[0].innerHeight - data.paddingVertical;
-		data.windowWidth  = data.viewportWidth  = data.contentWidth  = data.$window[0].innerWidth  - data.paddingHorizontal;
+		data.windowHeight = data.viewportHeight = data.contentHeight = data.$window.height() - data.paddingVertical;
+		data.windowWidth  = data.viewportWidth  = data.contentWidth  = data.$window.width()  - data.paddingHorizontal;
 		data.videoMarginTop = 0;
 		data.videoMarginLeft = 0;
 
@@ -893,14 +893,14 @@
 	 * @param $object [jQuery Object] "Object to size"
 	 */
 	function _sizeContent($object) {
-		data.windowHeight     = data.$window.height() - data.paddingVertical;
-		data.windowWidth      = data.$window.width() - data.paddingHorizontal;
-		data.objectHeight     = $object.outerHeight(true);
-		data.objectWidth      = $object.outerWidth(true);
-		data.targetHeight     = data.targetHeight || data.$target.data("boxer-height");
-		data.targetWidth      = data.targetWidth  || data.$target.data("boxer-width");
-		data.maxHeight        = (data.windowHeight < 0) ? options.minHeight : data.windowHeight;
-		data.isIframe         = $object.is("iframe");
+		data.windowHeight	 = data.$window.height() - data.paddingVertical;
+		data.windowWidth	  = data.$window.width() - data.paddingHorizontal;
+		data.objectHeight	 = $object.outerHeight(true);
+		data.objectWidth	  = $object.outerWidth(true);
+		data.targetHeight	 = data.targetHeight || data.$target.data("boxer-height");
+		data.targetWidth	  = data.targetWidth  || data.$target.data("boxer-width");
+		data.maxHeight		= (data.windowHeight < 0) ? options.minHeight : data.windowHeight;
+		data.isIframe		 = $object.is("iframe");
 		data.objectMarginTop  = 0;
 		data.objectMarginLeft = 0;
 
