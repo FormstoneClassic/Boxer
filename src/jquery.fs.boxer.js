@@ -64,6 +64,19 @@
 
 		/**
 		 * @method
+		 * @name close
+		 * @description Closes active instance of plugin
+		 * @example $.boxer("close");
+		 */
+		close: function() {
+			if (typeof data.$boxer !== "undefined") {
+				data.$boxer.off(".boxer");
+				data.$overlay.trigger("click");
+			}
+		},
+
+		/**
+		 * @method
 		 * @name defaults
 		 * @description Sets default plugin options
 		 * @param opts [object] <{}> "Options object"
@@ -77,11 +90,10 @@
 		/**
 		 * @method
 		 * @name destroy
-		 * @description Removes instance of plugin
-		 * @example $.boxer("destroy");
+		 * @description Removes plugin bindings
+		 * @example $(".target").boxer("destroy");
 		 */
 		destroy: function() {
-			_onClose();
 			return $(this).off(".boxer");
 		},
 
