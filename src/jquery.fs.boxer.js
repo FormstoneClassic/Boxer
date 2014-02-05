@@ -195,11 +195,12 @@
 
 		if (isImage || isVideo) {
 			// Check for gallery
-			var rel = data.$target.attr("rel");
-			if (typeof rel !== "undefined" && rel !== false) {
+			var id = data.$target.data("gallery") || data.$target.attr("rel"); // backwards compatibility
+
+			if (typeof id !== "undefined" && id !== false) {
 				data.gallery.active = true;
-				data.gallery.rel = rel;
-				data.gallery.$items = $("a[rel= " + data.gallery.rel + "]");
+				data.gallery.id = id;
+				data.gallery.$items = $("a[data-gallery= " + data.gallery.id + "], a[rel= " + data.gallery.id + "]"); // backwards compatibility
 				data.gallery.index = data.gallery.$items.index(data.$target);
 				data.gallery.total = data.gallery.$items.length - 1;
 			}
