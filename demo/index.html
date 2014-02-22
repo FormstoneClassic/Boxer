@@ -21,6 +21,9 @@
 			.boxer { border: none; }
 			.inline_content { width: 300px; overflow: hidden; }
 			#boxer h3 { font-style: italic; font-size: 16px; padding: 15px 10px 10px; }
+
+			#boxer.mobile .boxer-content { background: #fff; }
+			#boxer.mobile .inline_content { height: 10000px; overflow: scroll; padding: 30px 50px; width: 100%; }
 		</style>
 
 		<script>
@@ -55,16 +58,6 @@
 				$(".boxer.boxer_mobile").boxer({
 					mobile: true
 				});
-
-				/*
-				$("body").on("click", ".resize_modal", function() {
-					$("#boxer").trigger("resize", [500, 500]);
-					return false;
-				}).on("click", ".close_modal", function() {
-					$("#boxer").trigger("close");
-					return false;
-				});
-				*/
 			});
 		</script>
 	</head>
@@ -80,7 +73,6 @@
 			<div class="mobile-full tablet-full desktop-8 desktop-push-2">
 				<header class="header">
 					<h1>Boxer Demo</h1>
-					<!-- <p>A technical demonstration of the jQuery plugin.</p> -->
 					<br />
 					<a href="http://formstone.it/boxer/" class="button">View Documentation</a>
 				</header>

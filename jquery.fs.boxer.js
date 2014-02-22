@@ -1,5 +1,5 @@
 /* 
- * Boxer v3.0.8 - 2014-02-05 
+ * Boxer v3.0.9 - 2014-02-22 
  * A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library. 
  * http://formstone.it/boxer/ 
  * 
@@ -236,6 +236,7 @@
 		html += '">';
 		html += '<span class="boxer-close">' + data.labels.close + '</span>';
 		html += '<div class="boxer-container" style="';
+
 		if (data.isMobile) {
 			html += 'height: 100%; width: 100%';
 		} else {
@@ -692,7 +693,7 @@
 	 */
 	function _loadVideo(source) {
 		data.$videoWrapper = $('<div class="boxer-video-wrapper" />');
-		data.$video = $('<iframe class="boxer-video" />');
+		data.$video = $('<iframe class="boxer-video" seamless="seamless" />');
 
 		data.$video.attr("src", source)
 				   .addClass("boxer-video")
@@ -930,8 +931,8 @@
 			data.windowWidth  -= data.margin;
 		}
 
-		data.contentHeight = (data.targetHeight !== undefined) ? data.targetHeight : (data.isIframe) ? data.windowHeight : data.objectHeight;
-		data.contentWidth  = (data.targetWidth !== undefined)  ? data.targetWidth  : (data.isIframe) ? data.windowWidth  : data.objectWidth;
+		data.contentHeight = (data.targetHeight !== undefined) ? data.targetHeight : (data.isIframe || data.isMobile) ? data.windowHeight : data.objectHeight;
+		data.contentWidth  = (data.targetWidth !== undefined)  ? data.targetWidth  : (data.isIframe || data.isMobile) ? data.windowWidth  : data.objectWidth;
 
 		if (data.isIframe && data.isMobile) {
 			data.contentHeight = data.windowHeight;
