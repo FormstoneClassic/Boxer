@@ -1,5 +1,5 @@
 /* 
- * Boxer v3.0.11 - 2014-02-26 
+ * Boxer v3.0.12 - 2014-03-10 
  * A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library. 
  * http://formstone.it/boxer/ 
  * 
@@ -17,6 +17,7 @@
 	 * @param callback [function] <$.noop> "Funciton called after opening instance"
 	 * @param customClass [string] <''> "Class applied to instance"
 	 * @param duration [int] <250> "Animation duration"
+	 * @param extensions [array] <"jpg", "sjpg", "jpeg", "png", "gif"> "Image type extensions"
 	 * @param fixed [boolean] <false> "Flag for fixed positioning"
 	 * @param formatter [function] <$.noop> "Caption format function"
 	 * @param height [int] <100> "Initial height (while loading)"
@@ -40,6 +41,7 @@
 		callback: $.noop,
 		customClass: "",
 		duration: 250,
+		extensions: [ "jpg", "sjpg", "jpeg", "png", "gif" ],
 		fixed: false,
 		formatter: $.noop,
 		height: 100,
@@ -159,7 +161,7 @@
 			checkExt = source.toLowerCase().split("."),
 			extension = checkExt[ checkExt.length - 1 ],
 			type = '', // $target.data("type") || "";
-			isImage	= ( (type === "image") || (extension === "jpeg" || extension === "jpg" || extension === "gif" || extension === "png" || source.substr(0, 10) === "data:image") ),
+			isImage	= ( (type === "image") || ($.inArray(extension, e.data.extensions) > -1 || source.substr(0, 10) === "data:image") ),
 			isVideo	= ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 ),
 			isUrl	  = ( (type === "url") || (!isImage && !isVideo && source.substr(0, 4) === "http") ),
 			isElement  = ( (type === "element") || (!isImage && !isVideo && !isUrl && source.substr(0, 1) === "#") ),
