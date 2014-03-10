@@ -150,8 +150,8 @@
 		var $target = $(this),
 			$object = e.data.$object,
 			source = ($target[0].attributes) ? $target.attr("href") || "" : "",
-			checkExt = source.toLowerCase().split("."),
-			extension = checkExt[ checkExt.length - 1 ],
+			sourceParts = source.toLowerCase().split(".").pop().split(/\#|\?/),
+			extension = sourceParts[0],
 			type = '', // $target.data("type") || "";
 			isImage	= ( (type === "image") || ($.inArray(extension, e.data.extensions) > -1 || source.substr(0, 10) === "data:image") ),
 			isVideo	= ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 ),
