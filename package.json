@@ -2,7 +2,7 @@
   "name": "Boxer",
   "id": "boxer",
   "codename": "jquery.fs.boxer",
-  "version": "3.0.13",
+  "version": "3.1.0",
   "description": "A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library.",
   "keywords": [
   	"modal",

@@ -1,14 +1,16 @@
 ;(function ($, window) {
 	"use strict";
 
-	var data = {},
-		trueMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test((window.navigator.userAgent||window.navigator.vendor||window.opera));
+	var $body = null,
+		data = {},
+		trueMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test((window.navigator.userAgent||window.navigator.vendor||window.opera)),
+		transitionEvent,
+		transitionSupported;
 
 	/**
 	 * @options
 	 * @param callback [function] <$.noop> "Funciton called after opening instance"
 	 * @param customClass [string] <''> "Class applied to instance"
-	 * @param duration [int] <250> "Animation duration"
 	 * @param extensions [array] <"jpg", "sjpg", "jpeg", "png", "gif"> "Image type extensions"
 	 * @param fixed [boolean] <false> "Flag for fixed positioning"
 	 * @param formatter [function] <$.noop> "Caption format function"
@@ -32,7 +34,6 @@
 	var options = {
 		callback: $.noop,
 		customClass: "",
-		duration: 250,
 		extensions: [ "jpg", "sjpg", "jpeg", "png", "gif" ],
 		fixed: false,
 		formatter: $.noop,
@@ -136,6 +137,16 @@
 	 */
 	function _init(opts) {
 		options.formatter = _formatCaption;
+
+		$body = $("body");
+		transitionEvent = _getTransitionEvent();
+		transitionSupported = (transitionEvent !== false);
+
+		// no transitions :(
+		if (!transitionSupported) {
+			transitionEvent = "transitionend.boxer";
+		}
+
 		return $(this).on("click.boxer", $.extend({}, options, opts || {}), _build);
 	}
 
@@ -179,7 +190,14 @@
 			gallery: {
 				active: false
 			},
-			isMobile: (trueMobile || e.data.mobile)
+			isMobile: (trueMobile || e.data.mobile),
+			isAnimating: true,
+			/*
+			oldContainerHeight: 0,
+			oldContainerWidth: 0,
+			*/
+			oldContentHeight: 0,
+			oldContentWidth: 0
 		}, e.data);
 
 		// Double the margin
@@ -211,9 +229,9 @@
 		// Assemble HTML
 		var html = '';
 		if (!data.isMobile) {
-			html += '<div id="boxer-overlay" class="' + data.customClass + '" style="opacity: 0"></div>';
+			html += '<div id="boxer-overlay" class="' + data.customClass + '"></div>';
 		}
-		html += '<div id="boxer" class="loading ' + data.customClass;
+		html += '<div id="boxer" class="loading animating ' + data.customClass;
 		if (data.isMobile) {
 			html += ' mobile';
 		}
@@ -223,27 +241,26 @@
 		if (isElement || isObject) {
 			html += ' inline';
 		}
-		html += '" style="opacity: 0;';
+		html += '"';
 		if (data.fixed === true) {
-			html += ' position: fixed;';
+			html += ' style="position: fixed;"';
 		}
-		html += '">';
+		html += '>';
 		html += '<span class="boxer-close">' + data.labels.close + '</span>';
 		html += '<div class="boxer-container" style="';
-
 		if (data.isMobile) {
 			html += 'height: 100%; width: 100%';
 		} else {
 			html += 'height: ' + data.height + 'px; width: ' + data.width + 'px';
 		}
 		html += '">';
-		html += '<div class="boxer-content" style="opacity: 0;">';
+		html += '<div class="boxer-content">';
 		if (isImage || isVideo) {
 			html += '<div class="boxer-meta">';
 
 			if (data.gallery.active) {
-				html += '<div class="boxer-arrow previous">' + data.labels.previous + '</div>';
-				html += '<div class="boxer-arrow next">' + data.labels.next + '</div>';
+				html += '<div class="boxer-control previous">' + data.labels.previous + '</div>';
+				html += '<div class="boxer-control next">' + data.labels.next + '</div>';
 				html += '<p class="boxer-position"';
 				if (data.gallery.total < 1) {
 					html += ' style="display: none;"';
@@ -272,8 +289,7 @@
 		data.$meta = data.$boxer.find(".boxer-meta");
 		data.$position = data.$boxer.find(".boxer-position");
 		data.$caption = data.$boxer.find(".boxer-caption");
-		data.$arrows = data.$boxer.find(".boxer-arrow");
-		data.$animatables = $("#boxer-overlay, #boxer, .boxer-container");
+		data.$controls = data.$boxer.find(".boxer-control");
 		data.paddingVertical = parseInt(data.$boxer.css("paddingTop"), 10) + parseInt(data.$boxer.css("paddingBottom"), 10);
 		data.paddingHorizontal = parseInt(data.$boxer.css("paddingLeft"), 10) + parseInt(data.$boxer.css("paddingRight"), 10);
 
@@ -290,25 +306,36 @@
 				  .on("touchmove.boxer", _killEvent);
 
 		if (data.gallery.active) {
-			data.$boxer.on("touchstart.boxer click.boxer", ".boxer-arrow", _advanceGallery);
+			data.$boxer.on("touchstart.boxer click.boxer", ".boxer-control", _advanceGallery);
 		}
 
-		data.$overlay.stop().animate({ opacity: data.opacity }, data.duration);
-		data.$boxer.stop().animate({ opacity: 1 }, data.duration, function() {
-			if (isImage) {
-				_loadImage(source);
-			} else if (isVideo) {
-				_loadVideo(source);
-			} else if (isUrl) {
-				_loadURL(source);
-			} else if (isElement) {
-				_cloneElement(source);
-			} else if (isObject) {
-				_appendObject(data.$object);
-			} else {
-				$.error("BOXER: '" +  source + "' is not valid.");
+		data.$boxer.on(transitionEvent, function(e) {
+			_killEvent(e);
+
+			if ($(e.target).is(data.$boxer)) {
+				data.$boxer.off(transitionEvent);
+
+				if (isImage) {
+					_loadImage(source);
+				} else if (isVideo) {
+					_loadVideo(source);
+				} else if (isUrl) {
+					_loadURL(source);
+				} else if (isElement) {
+					_cloneElement(source);
+				} else if (isObject) {
+					_appendObject(data.$object);
+				} else {
+					$.error("BOXER: '" +  source + "' is not valid.");
+				}
 			}
 		});
+
+		$body.addClass("boxer-open");
+
+		if (!transitionSupported) {
+			data.$boxer.trigger(transitionEvent);
+		}
 
 		if (isObject) {
 			return data.$boxer;
@@ -324,10 +351,26 @@
 	function _onClose(e) {
 		_killEvent(e);
 
-		if (typeof data.$animatables !== "undefined") {
-			data.$animatables.stop().animate({ opacity: 0 }, data.duration, function() {
-				$(this).remove();
-			});
+		if (typeof data.$boxer !== "undefined") {
+
+			data.$boxer.on(transitionEvent, function(e) {
+				_killEvent(e);
+
+				if ($(e.target).is(data.$boxer)) {
+					data.$boxer.off(transitionEvent);
+
+					data.$overlay.remove();
+					data.$boxer.remove();
+
+					data = {};
+				}
+			}).addClass("animating");
+
+			$body.removeClass("boxer-open");
+
+			if (!transitionSupported) {
+				data.$boxer.trigger(transitionEvent);
+			}
 
 			_clearTimer(data.resizeTimer);
 
@@ -349,8 +392,6 @@
 			}
 
 			data.$window.trigger("close.boxer");
-
-			data = {};
 		}
 	}
 
@@ -361,13 +402,13 @@
 	 */
 	function _open() {
 		var position = _position(),
-			arrowHeight = 0,
+			controlHeight = 0,
 			durration = data.isMobile ? 0 : data.duration;
 
 		if (!data.isMobile) {
-			arrowHeight = data.$arrows.outerHeight();
-			data.$arrows.css({
-				marginTop: ((data.contentHeight - arrowHeight) / 2)
+			controlHeight = data.$controls.outerHeight();
+			data.$controls.css({
+				marginTop: ((data.contentHeight - controlHeight) / 2)
 			});
 		}
 
@@ -379,33 +420,65 @@
 			data.$body.addClass("boxer-open");
 		}
 
-		data.$boxer.stop().animate({
+		data.$boxer.css({
 			left: position.left,
 			top:  position.top
-		}, durration);
-		data.$container.show().stop().animate({
+		});
+
+		data.$container.on(transitionEvent, function(e) {
+			_killEvent(e);
+
+			if ($(e.target).is(data.$container)) {
+				data.$container.off(transitionEvent);
+
+				data.$content.on(transitionEvent, function(e) {
+					_killEvent(e);
+
+					if ($(e.target).is(data.$content)) {
+						data.$content.off(transitionEvent);
+
+						data.$boxer.removeClass("animating");
+
+						data.isAnimating = false;
+					}
+				});
+
+				data.$boxer.removeClass("loading");
+
+				if (!transitionSupported) {
+					data.$content.trigger(transitionEvent);
+				}
+
+				data.visible = true;
+
+				// Fire callback + event
+				data.callback.apply(data.$boxer);
+				data.$window.trigger("open.boxer");
+
+				// Start preloading
+				if (data.gallery.active) {
+					_preloadGallery();
+				}
+			}
+		}).css({
 			height: data.containerHeight,
 			width:  data.containerWidth
-		}, durration, function(e) {
-			data.$content.stop().animate({
-				opacity: 1
-			}, data.duration);
-			data.$boxer.removeClass("loading")
-					   .find(".boxer-close").stop().animate({
-						   opacity: 1
-					   }, data.duration);
-
-			data.visible = true;
-
-			// Fire callback + event
-			data.callback.apply(data.$boxer);
-			data.$window.trigger("open.boxer");
-
-			// Start preloading
-			if (data.gallery.active) {
-				_preloadGallery();
-			}
 		});
+
+		/* var containerHasChanged = (data.oldContainerHeight !== data.containerHeight || data.oldContainerWidth !== data.containerWidth), */
+		var contentHasChanged   = (data.oldContentHeight !== data.contentHeight || data.oldContentWidth !== data.contentWidth);
+
+		if (data.isMobile || !transitionSupported || !contentHasChanged /* || !containerHasChanged */) {
+			data.$container.trigger(transitionEvent);
+		}
+
+		// tracking changes
+		/*
+		data.oldContainerHeight = data.containerHeight;
+		data.oldContainerWidth  = data.containerWidth;
+		*/
+		data.oldContentHeight = data.contentHeight;
+		data.oldContentWidth  = data.contentWidth;
 	}
 
 	/**
@@ -419,25 +492,28 @@
 
 		if (data.visible) {
 			var position = _position(),
-				arrowHeight = 0;
+				controlHeight = 0;
 
 			if (!data.isMobile) {
-				arrowHeight = data.$arrows.outerHeight();
-				data.$arrows.css({
-					marginTop: ((data.contentHeight - arrowHeight) / 2)
+				controlHeight = data.$controls.outerHeight();
+				data.$controls.css({
+					marginTop: ((data.contentHeight - controlHeight) / 2)
 				});
 			}
 
+			/*
 			if (animate) {
-				data.$boxer.stop().animate({
+				data.$boxer.css({
 					left: position.left,
 					top:  position.top
 				}, data.duration);
-				data.$container.show().stop().animate({
+
+				data.$container.css({
 					height: data.containerHeight,
 					width:  data.containerWidth
 				});
 			} else {
+			*/
 				data.$boxer.css({
 					left: position.left,
 					top:  position.top
@@ -446,7 +522,7 @@
 					height: data.containerHeight,
 					width:  data.containerWidth
 				});
-			}
+			/* } */
 		}
 	}
 
@@ -519,6 +595,7 @@
 			}
 
 			data.$content.prepend(data.$image);
+
 			if (data.$caption.html() === "") {
 				data.$caption.hide();
 			} else {
@@ -758,13 +835,13 @@
 			marginLeft: data.videoMarginLeft
 		});
 
-		if (!data.isMobile) {
-			data.metaHeight = data.$meta.outerHeight(true);
-			data.contentHeight = data.targetVideoHeight + data.metaHeight;
-		}
-
 		data.containerHeight = data.contentHeight;
 		data.containerWidth  = data.contentWidth;
+
+		if (!data.isMobile) {
+			data.metaHeight = data.$meta.outerHeight(true);
+			data.containerHeight = data.targetVideoHeight + data.metaHeight;
+		}
 	}
 
 	/**
@@ -799,13 +876,11 @@
 	function _advanceGallery(e) {
 		_killEvent(e);
 
-		// Click target
-		var $arrow = $(this);
+		var $control = $(this);
+		if (!data.isAnimating && !$control.hasClass("disabled")) {
+			data.isAnimating = true;
 
-		if (!$arrow.hasClass("disabled")) {
-			data.$boxer.addClass("loading");
-
-			data.gallery.index += ($arrow.hasClass("next")) ? 1 : -1;
+			data.gallery.index += ($control.hasClass("next")) ? 1 : -1;
 			if (data.gallery.index > data.gallery.total) {
 				data.gallery.index = data.gallery.total;
 			}
@@ -813,28 +888,40 @@
 				data.gallery.index = 0;
 			}
 
-			data.$content.stop().animate({ opacity: 0 }, data.duration, function() {
-				if (typeof data.$image !== 'undefined') {
-					data.$image.remove();
-				}
-				if (typeof data.$videoWrapper !== 'undefined') {
-					data.$videoWrapper.remove();
-				}
-				data.$target = data.gallery.$items.eq(data.gallery.index);
+			data.$content.on(transitionEvent, function(e) {
+				_killEvent(e);
 
-				data.$caption.html(data.formatter.apply(data.$body, [data.$target]));
-				data.$position.find(".current").html(data.gallery.index + 1);
+				if ($(e.target).is(data.$content)) {
+					data.$content.off(transitionEvent);
 
-				var source = data.$target.attr("href"),
-					isVideo = ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 );
+					if (typeof data.$image !== 'undefined') {
+						data.$image.remove();
+					}
+					if (typeof data.$videoWrapper !== 'undefined') {
+						data.$videoWrapper.remove();
+					}
+					data.$target = data.gallery.$items.eq(data.gallery.index);
 
-				if (isVideo) {
-					_loadVideo(source);
-				} else {
-					_loadImage(source);
+					data.$caption.html(data.formatter.apply(data.$body, [data.$target]));
+					data.$position.find(".current").html(data.gallery.index + 1);
+
+					var source = data.$target.attr("href"),
+						isVideo = ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 );
+
+					if (isVideo) {
+						_loadVideo(source);
+					} else {
+						_loadImage(source);
+					}
+					_updateControls();
 				}
-				_updateControls();
 			});
+
+			data.$boxer.addClass("loading animating");
+
+			if (!transitionSupported) {
+				data.$content.trigger(transitionEvent);
+			}
 		}
 	}
 
@@ -844,12 +931,12 @@
 	 * @description Updates gallery control states
 	 */
 	function _updateControls() {
-		data.$arrows.removeClass("disabled");
+		data.$controls.removeClass("disabled");
 		if (data.gallery.index === 0) {
-			data.$arrows.filter(".previous").addClass("disabled");
+			data.$controls.filter(".previous").addClass("disabled");
 		}
 		if (data.gallery.index === data.gallery.total) {
-			data.$arrows.filter(".next").addClass("disabled");
+			data.$controls.filter(".next").addClass("disabled");
 		}
 	}
 
@@ -863,7 +950,7 @@
 		if (data.gallery.active && (e.keyCode === 37 || e.keyCode === 39)) {
 			_killEvent(e);
 
-			data.$arrows.filter((e.keyCode === 37) ? ".previous" : ".next").trigger("click");
+			data.$controls.filter((e.keyCode === 37) ? ".previous" : ".next").trigger("click");
 		} else if (e.keyCode === 27) {
 			data.$boxer.find(".boxer-close").trigger("click");
 		}
@@ -1020,7 +1107,6 @@
 	 */
 	function _onTouchEnd(e) {
 		_killEvent(e);
-
 		_clearTimer(data.touchTimer);
 
 		data.$boxer.off("touchmove.boxer touchend.boxer");
@@ -1041,7 +1127,7 @@
 			}
 
 			if (data.swipe) {
-				data.$arrows.filter( (data.delta <= data.leftPosition) ? ".previous" : ".next" ).trigger("click");
+				data.$controls.filter( (data.delta <= data.leftPosition) ? ".previous" : ".next" ).trigger("click");
 			}
 			_startTimer(data.resetTimer, data.duration, function() {
 				data.$boxer.removeClass("animated");
@@ -1115,6 +1201,32 @@
 			clearTimeout(timer);
 			timer = null;
 		}
+	}
+
+	/**
+	 * @method private
+	 * @name _getTransitionEvent
+	 * @description Retuns a properly prefixed transitionend event
+	 * @return [string] "Properly prefixed event"
+	 */
+	function _getTransitionEvent() {
+		var transitions = {
+				'WebkitTransition': 'webkitTransitionEnd',
+				'MozTransition':    'transitionend',
+				/* 'MSTransitionEnd':  'msTransition', */
+				/* 'msTransition':     'MSTransitionEnd' */
+				'OTransition':      'oTransitionEnd',
+				'transition':       'transitionend'
+			},
+			test = document.createElement('div');
+
+		for (var type in transitions) {
+			if (transitions.hasOwnProperty(type) && type in test.style) {
+				return transitions[type];
+			}
+		}
+
+		return false;
 	}
 
 	$.fn.boxer = function(method) {
