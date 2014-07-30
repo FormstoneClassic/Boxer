@@ -1017,14 +1017,23 @@
 		data.contentHeight = (data.targetHeight !== undefined) ? data.targetHeight : (data.isIframe || data.isMobile) ? data.windowHeight : data.objectHeight;
 		data.contentWidth  = (data.targetWidth !== undefined)  ? data.targetWidth  : (data.isIframe || data.isMobile) ? data.windowWidth  : data.objectWidth;
 
-		if (data.isIframe && data.isMobile) {
+		if ((data.isIframe || data.isObject) && data.isMobile) {
 			data.contentHeight = data.windowHeight;
 			data.contentWidth  = data.windowWidth;
+		} else if (data.isObject) {
+			data.contentHeight = (data.contentHeight > data.windowHeight) ? data.windowHeight : data.contentHeight;
+			data.contentWidth  = (data.contentWidth > data.windowWidth)   ? data.windowWidth  : data.contentWidth;
 		}
 
 		_setContentSize(data);
 	}
 
+	/**
+	 * @method private
+	 * @name _setContentSize
+	 * @description Sets content dimensions
+	 * @param data [object] "Instance data"
+	 */
 	function _setContentSize(data) {
 		data.containerHeight = data.contentHeight;
 		data.containerWidth  = data.contentWidth;

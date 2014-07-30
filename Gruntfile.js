@@ -45,7 +45,7 @@ module.exports = function(grunt) {
 				files: {
 					'<%= pkg.codename %>.js': [ 'src/<%= pkg.codename %>.js' ]
 				}
-			},
+			} /* ,
 			css: {
 				options: {
 					banner: '<%= meta.banner %>'
@@ -53,7 +53,7 @@ module.exports = function(grunt) {
 				files: {
 					'<%= pkg.codename %>.css': [ 'src/<%= pkg.codename %>.css' ]
 				}
-			}
+			} */
 		},
 		// Uglify
 		uglify: {
@@ -92,8 +92,8 @@ module.exports = function(grunt) {
 					sync: [ 'name', 'version', 'description', 'author', 'license', 'homepage' ],
 					overrides: {
 						main: [
-							'<%= pkg.codename %>.js',
-							'<%= pkg.codename %>.css'
+							'<%= pkg.codename %>.js' /* ,
+							'<%= pkg.codename %>.css' */
 						],
 						ignore: [ "*.jquery.json", "Gruntfile.js", "src/" ]
 					}
