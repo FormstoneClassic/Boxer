@@ -2,20 +2,22 @@
 <html lang="en">
 	<head>
 		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
-		<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 
 		<title>Boxer Demo</title>
 
-		<link href="http://formstone.it/css/demo.css" rel="stylesheet" type="text/css" media="all" />
+		<link href="http://formstone.it/css/demo.css" rel="stylesheet" type="text/css" media="all">
 
 		<!--[if LTE IE 8]>
-			<link href="http://formstone.it/css/demo.ie.css" rel="stylesheet" type="text/css" media="all" />
+			<link href="http://formstone.it/css/demo.ie.css" rel="stylesheet" type="text/css" media="all">
 		<![endif]-->
 
 		<script src="http://formstone.it/js/demo.js"></script>
 
-		<link href="../jquery.fs.boxer.css" rel="stylesheet" type="text/css" media="all" />
+		<link href="../jquery.fs.boxer.css" rel="stylesheet" type="text/css" media="all">
 		<script src="../jquery.fs.boxer.js"></script>
+
+		<!--[DEMO:START-RESOURCES]-->
 
 		<style>
 			.boxer { border: none; }
@@ -58,8 +60,16 @@
 				$(".boxer.boxer_mobile").boxer({
 					mobile: true
 				});
+
+				$(window).one("pronto.load", function() {
+					$.boxer("close");
+					$(".boxer").boxer("destroy");
+				});
 			});
 		</script>
+
+		<!--[DEMO:END-RESOURCES]-->
+
 	</head>
 	<body class="gridlock demo">
 		<header id="header">
@@ -73,9 +83,11 @@
 			<div class="mobile-full tablet-full desktop-8 desktop-push-2">
 				<header class="header">
 					<h1>Boxer Demo</h1>
-					<br />
+					<br>
 					<a href="http://formstone.it/boxer/" class="button">View Documentation</a>
 				</header>
+
+				<!--[DEMO:START-CONTENT]-->
 
 				<!-- Basic -->
 				<h2>Basic</h2>
@@ -89,11 +101,11 @@
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
-						<img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;" />
+						<img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
 
-				<br />
+				<br>
 
 				<!-- Gallery -->
 				<h2>Gallery</h2>
@@ -109,17 +121,17 @@
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image" data-gallery="gallery" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
-					    <img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;" />
+					    <img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;">
 					</a>
 					<a href="http://formstone.it/files/demo/nasa-bw-2.jpg" class="boxer boxer_image" data-gallery="gallery" title="By NASA on The Commons (Bumper V-2 Launch) [Public domain], via Wikimedia Commons">
-					    <img src="http://formstone.it/files/demo/nasa-bw-2.jpg" alt="" style="height: 100px;" />
+					    <img src="http://formstone.it/files/demo/nasa-bw-2.jpg" alt="" style="height: 100px;">
 					</a>
 					<a href="http://formstone.it/files/demo/nasa-bw-3.jpg" class="boxer boxer_image" data-gallery="gallery" title="By NASA on The Commons [Public domain], via Wikimedia Commons">
-					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;" />
+					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
 
-				<br />
+				<br>
 
 				<!-- YouTube & Vimeo -->
 				<h2>YouTube &amp; Vimeo Videos</h2>
@@ -139,7 +151,7 @@
 					</a>
 				</div>
 
-				<br />
+				<br>
 
 				<!-- Mobile -->
 				<h2>Mobile</h2>
@@ -152,17 +164,17 @@
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image boxer_mobile" data-gallery="gallery_mobile" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
-						<img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;" />
+						<img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;">
 					</a>
 					<a href="http://formstone.it/files/demo/nasa-bw-2.jpg" class="boxer boxer_image boxer_mobile" data-gallery="gallery_mobile" title="By NASA on The Commons (Bumper V-2 Launch) [Public domain], via Wikimedia Commons">
-					    <img src="http://formstone.it/files/demo/nasa-bw-2.jpg" alt="" style="height: 100px;" />
+					    <img src="http://formstone.it/files/demo/nasa-bw-2.jpg" alt="" style="height: 100px;">
 					</a>
 					<a href="http://formstone.it/files/demo/nasa-bw-3.jpg" class="boxer boxer_image boxer_mobile" data-gallery="gallery_mobile" title="By NASA on The Commons [Public domain], via Wikimedia Commons">
-					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;" />
+					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
 
-				<br />
+				<br>
 
 				<!-- FIXED -->
 				<h2>Fixed Positioning</h2>
@@ -175,17 +187,17 @@
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image boxer_fixed" data-gallery="gallery_fixed" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
-					    <img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;" />
+					    <img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;">
 					</a>
 					<a href="http://formstone.it/files/demo/nasa-bw-2.jpg" class="boxer boxer_image boxer_fixed" data-gallery="gallery_fixed" title="By NASA on The Commons (Bumper V-2 Launch) [Public domain], via Wikimedia Commons">
-					    <img src="http://formstone.it/files/demo/nasa-bw-2.jpg" alt="" style="height: 100px;" />
+					    <img src="http://formstone.it/files/demo/nasa-bw-2.jpg" alt="" style="height: 100px;">
 					</a>
 					<a href="http://formstone.it/files/demo/nasa-bw-3.jpg" class="boxer boxer_image boxer_fixed" data-gallery="gallery_fixed" title="By NASA on The Commons [Public domain], via Wikimedia Commons">
-					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;" />
+					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
 
-				<br />
+				<br>
 
 				<!-- Top -->
 				<h2>Top Positioning</h2>
@@ -198,17 +210,17 @@
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image boxer_top" data-gallery="gallery_top" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
-						<img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;" />
+						<img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;">
 					</a>
 					<a href="http://formstone.it/files/demo/nasa-bw-2.jpg" class="boxer boxer_image boxer_top" data-gallery="gallery_top" title="By NASA on The Commons (Bumper V-2 Launch) [Public domain], via Wikimedia Commons">
-					    <img src="http://formstone.it/files/demo/nasa-bw-2.jpg" alt="" style="height: 100px;" />
+					    <img src="http://formstone.it/files/demo/nasa-bw-2.jpg" alt="" style="height: 100px;">
 					</a>
 					<a href="http://formstone.it/files/demo/nasa-bw-3.jpg" class="boxer boxer_image boxer_top" data-gallery="gallery_top" title="By NASA on The Commons [Public domain], via Wikimedia Commons">
-					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;" />
+					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
 
-				<br />
+				<br>
 
 				<!-- IN-LINE CONTENT -->
 				<h2>In-Line Content</h2>
@@ -236,7 +248,7 @@
 					</div>
 				</div>
 
-				<br />
+				<br>
 
 				<!-- jQUERY OBJECTS -->
 				<h2>jQuery Objects</h2>
@@ -253,7 +265,7 @@ $.boxer($obj);</code></pre>
 					<a href="#" class="boxer boxer_object button small">Show jQuery Object</a>
 				</div>
 
-				<br />
+				<br>
 
 				<!-- iFRAME -->
 				<h2>iFrame</h2>
@@ -266,7 +278,7 @@ $.boxer($obj);</code></pre>
 					<a href="http://www.cnn.com/" class="boxer button small">View CNN.com</a>
 				</div>
 
-				<br />
+				<br>
 
 				<!-- CUSTOM SIZE -->
 				<h2>Sizing</h2>
@@ -279,7 +291,7 @@ $.boxer($obj);</code></pre>
 					<a href="http://www.cnn.com/" class="boxer button small" data-boxer-height="500" data-boxer-width="500">View CNN.com</a>
 				</div>
 
-				<br />
+				<br>
 
 				<!-- CAPTION FORMATTING -->
 				<h2>Caption Formating</h2>
@@ -296,11 +308,11 @@ function formatCaptions($target) {
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image boxer_format" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
-					    <img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;" />
+					    <img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
 
-				<br />
+				<br>
 
 				<!-- RETINA -->
 				<h2>Retina Support</h2>
@@ -317,9 +329,11 @@ function formatCaptions($target) {
 				<h5>Demo</h5>
 				<div class="clear_fix">
 					<a href="http://formstone.it/files/demo/nasa-bw-retina.jpg" class="boxer boxer_image retina" title="By Apollo 15 astronaut.Bubba73 at en.wikipedia [Public domain], from Wikimedia Commons">
-						<img src="http://formstone.it/files/demo/nasa-bw-retina.jpg" alt="" style="height: 100px;" />
+						<img src="http://formstone.it/files/demo/nasa-bw-retina.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
+
+				<!--[DEMO:END-CONTENT]-->
 
 			</div>
 		</article>

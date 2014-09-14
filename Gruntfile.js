@@ -92,8 +92,8 @@ module.exports = function(grunt) {
 					sync: [ 'name', 'version', 'description', 'author', 'license', 'homepage' ],
 					overrides: {
 						main: [
-							'<%= pkg.codename %>.js' /* ,
-							'<%= pkg.codename %>.css' */
+							'<%= pkg.codename %>.js',
+							'<%= pkg.codename %>.css'
 						],
 						ignore: [ "*.jquery.json", "Gruntfile.js", "src/" ]
 					}

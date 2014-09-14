@@ -1,5 +1,5 @@
 /* 
- * Boxer v3.1.1 - 2014-07-30 
+ * Boxer v3.1.2 - 2014-09-13 
  * A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library. 
  * http://formstone.it/boxer/ 
  * 

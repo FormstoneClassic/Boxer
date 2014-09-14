@@ -1,6 +1,6 @@
 {
   "name": "boxer",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "title": "Boxer",
   "author": {
     "name": "Ben Plum",
@@ -23,12 +23,11 @@
     "ui",
     "javascript",
     "jquery",
-    "formstone",
-    "benplum"
+    "formstone"
   ],
   "docs": "http://formstone.it/boxer/",
   "demo": "http://formstone.it/boxer/",
-  "download": "https://github.com/benplum/Boxer",
-  "bugs": "https://github.com/benplum/Boxer/issues",
+  "download": "https://github.com/Formstone/Boxer",
+  "bugs": "https://github.com/Formstone/Boxer/issues",
   "homepage": "http://formstone.it/boxer/"
 }
