@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
-		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 		<title>Boxer Demo</title>
 
+		<!-- Modernizer -->
+		<script src="http://formstone.it/js/modernizr.js"></script>
+
+		<!-- Demo Resources -->
 		<link href="http://formstone.it/css/demo.css" rel="stylesheet" type="text/css" media="all">
-
-		<!--[if LTE IE 8]>
-			<link href="http://formstone.it/css/demo.ie.css" rel="stylesheet" type="text/css" media="all">
-		<![endif]-->
-
 		<script src="http://formstone.it/js/demo.js"></script>
+
+		<!--[if IE 8]>
+        	<script>var IE8 = true;</script>
+        	<script src="http://formstone.it/js/site.ie8.js"></script>
+			<link rel="stylesheet" href="http://formstone.it/css/demo.ie8.css">
+		<![endif]-->
+		<!--[if IE 9]>
+        	<script>var IE9 = true;</script>
+        	<script src="http://formstone.it/js/site.ie9.js"></script>
+		<![endif]-->
 
 		<link href="../jquery.fs.boxer.css" rel="stylesheet" type="text/css" media="all">
 		<script src="../jquery.fs.boxer.js"></script>
@@ -21,8 +30,8 @@
 
 		<style>
 			.boxer { border: none; }
-			.inline_content { width: 300px; overflow: hidden; }
-			#boxer h3 { font-style: italic; font-size: 16px; padding: 15px 10px 10px; }
+			.inline_content { width: 300px; overflow: hidden; padding: 0 20px; }
+			#boxer h3 { font-style: italic; font-size: 16px; margin: 0; padding: 15px 10px 10px; }
 
 			#boxer.mobile.inline .boxer-content { background: #fff; }
 			#boxer.mobile.inline .inline_content { height: 10000px; overflow: scroll; padding: 30px 50px; width: 100%; }
