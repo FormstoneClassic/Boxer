@@ -1,4 +1,7 @@
 /*global module:false*/
+
+// Less
+
 module.exports = function(grunt) {
 
 	grunt.initConfig({
@@ -142,9 +145,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-jquerymanifest');
 	grunt.loadNpmTasks('grunt-contrib-less');
-	grunt.loadNpmTasks('grunt-npm2bower-sync');
 	grunt.loadNpmTasks('grunt-autoprefixer');
 	grunt.loadNpmTasks('grunt-banner');
+	grunt.loadNpmTasks('grunt-npm2bower-sync');
 
 	// Local tasks
 	grunt.registerTask('buildReadme', 'Build Formstone README.md file.', function () {
@@ -163,6 +166,6 @@ module.exports = function(grunt) {
 	});
 
 	// Default task.
-	grunt.registerTask('default', [ 'jshint', 'copy', 'uglify', 'jquerymanifest', 'less', 'sync', 'autoprefixer', 'usebanner', 'buildReadme' ]);
+	grunt.registerTask('default', [ 'jshint', 'copy', 'uglify', 'jquerymanifest', 'less', 'autoprefixer', 'usebanner', 'sync', 'buildReadme' ]);
 
 };
