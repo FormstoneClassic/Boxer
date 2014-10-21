@@ -1,5 +1,5 @@
 /* 
- * Boxer v3.2.0 - 2014-09-20 
+ * Boxer v3.2.1 - 2014-10-21 
  * A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library. 
  * http://formstone.it/boxer/ 
  * 
@@ -10,28 +10,44 @@
   overflow: hidden !important;
 }
 #boxer-overlay {
-  background: #000;
+  width: 100%;
   height: 100%;
-  left: 0;
-  opacity: 0;
   position: fixed;
   top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 105;
+  background: #000000;
+  opacity: 0;
   -webkit-transition: opacity 0.25s linear;
           transition: opacity 0.25s linear;
-  width: 100%;
-  z-index: 105;
 }
 .boxer-open #boxer-overlay {
   opacity: 0.75;
 }
 #boxer {
-  background: #fff;
-  border-radius: 3px;
-  box-shadow: 0 0 25px #000;
-  opacity: 0;
-  padding: 10px;
   position: absolute;
   z-index: 105;
+  background: #ffffff;
+  border-radius: 3px;
+  box-shadow: 0 0 25px #000000;
+  opacity: 0;
+  padding: 10px;
+}
+#boxer,
+#boxer * {
+  -webkit-user-select: none !important;
+     -moz-user-select: none !important;
+      -ms-user-select: none !important;
+          user-select: none !important;
+}
+#boxer,
+#boxer *,
+#boxer *:before,
+#boxer *:after {
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
 }
 #boxer.inline {
   padding: 30px;
@@ -60,39 +76,62 @@
           transition: none;
 }
 #boxer .boxer-close {
-  background: #ffffff url(jquery.fs.boxer-icons.png) no-repeat -70px 10px;
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: -7.5px;
+  right: -7.5px;
+  z-index: 106;
+  background: #ffffff;
   border-radius: 100%;
   cursor: pointer;
   display: block;
-  height: 30px;
-  position: absolute;
+  overflow: hidden;
   padding: 0;
-  right: -8px;
-  top: -8px;
-  width: 30px;
-  text-indent: -99999px;
-  z-index: 106;
+  text-indent: 200%;
+  white-space: nowrap;
 }
-.no-touch #boxer .boxer-close:hover {
-  background-position: -70px -20px;
+#boxer .boxer-close:before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  color: #999999;
+  content: "\00d7";
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 30px;
+  margin: auto;
+  text-align: center;
+  text-indent: 0;
+  -webkit-transition: color 0.15s linear;
+          transition: color 0.15s linear;
+}
+.no-touch #boxer .boxer-close:hover:before {
+  color: #666666;
+}
+.no-opacity #boxer .boxer-close {
+  text-indent: -999px;
 }
 #boxer .boxer-container {
-  background: #fff;
-  height: 100%;
-  overflow: hidden;
-  position: relative;
   width: 100%;
+  height: 100%;
+  position: relative;
   z-index: 105;
+  background: #ffffff;
+  overflow: hidden;
 }
 #boxer.loading .boxer-container {
   background: #ffffff url(jquery.fs.boxer-loading.gif) no-repeat center;
 }
 #boxer .boxer-content {
-  background: #fff;
+  width: 10000px;
+  background: #ffffff;
   opacity: 0;
   overflow: hidden;
   padding: 0;
-  width: 10000px;
 }
 .no-touch #boxer .boxer-content .boxer-control,
 .no-touch #boxer .boxer-content .boxer-control.disabled {
@@ -105,145 +144,203 @@
   opacity: 1;
 }
 .no-touch #boxer .boxer-content:hover .boxer-control.disabled {
-  opacity: 0.3;
+  opacity: 0.25;
   cursor: default !important;
 }
 #boxer .boxer-image {
   float: left;
 }
 #boxer .boxer-video {
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 #boxer .boxer-iframe {
+  width: 100%;
+  height: 100%;
   border: none;
   float: left;
-  height: 100%;
   overflow: auto;
-  width: 100%;
 }
 #boxer .boxer-meta {
   clear: both;
 }
 #boxer .boxer-control {
-  background: #ffffff url(jquery.fs.boxer-icons.png) no-repeat 0 0;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 0;
+  background: #ffffff;
   border-radius: 100%;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
   cursor: pointer;
   display: block;
-  height: 40px;
   margin-right: auto;
   margin-left: auto;
+  overflow: hidden;
+  text-indent: 200%;
+  -webkit-transition: opacity 0.15s linear;
+          transition: opacity 0.15s linear;
+  white-space: nowrap;
+}
+#boxer .boxer-control:before {
+  width: 0;
+  height: 0;
   position: absolute;
-  text-indent: -99999px;
   top: 0;
-  width: 40px;
-  -webkit-transition: opacity 0.25s linear;
-          transition: opacity 0.25s linear;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  content: '';
+  margin: auto;
 }
 #boxer .boxer-control.previous {
   left: 20px;
 }
+#boxer .boxer-control.previous:before {
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 10.4px solid #333333;
+  margin-left: 14px;
+}
 #boxer .boxer-control.next {
-  background-position: -40px 0;
   right: 20px;
 }
+#boxer .boxer-control.next:before {
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 10.4px solid #333333;
+  margin-right: 14px;
+}
 #boxer .boxer-control.disabled {
-  opacity: 0.3;
+  opacity: 0.25;
+}
+.no-opacity #boxer .boxer-control {
+  text-indent: -999px;
+}
+#boxer .boxer-meta {
+  padding: 10px 0 0 0;
 }
 #boxer .boxer-position {
-  color: #999;
-  font-size: 11px;
+  color: #999999;
+  font-size: 12px;
   margin: 0;
-  padding: 15px 10px 5px;
+  padding: 15px 15px 0 15px;
 }
 #boxer .boxer-caption p {
+  color: #666666;
+  font-size: 14px;
   margin: 0;
-  padding: 15px 10px 10px 10px;
+  padding: 15px;
 }
 #boxer .boxer-caption.gallery p {
   padding-top: 0;
 }
 #boxer.mobile {
-  background: #000;
-  border-radius: 0;
+  width: 100%;
   height: 100%;
-  left: 0;
-  padding: 30px 0 0;
   position: fixed;
   top: 0;
-  width: 100%;
-}
-#boxer.mobile .boxer-close {
-  background-color: #000;
-  background-position: -70px -60px;
-  border-radius: 0;
   right: 0;
+  bottom: 0;
+  left: 0;
+  background: #111111;
+  border-radius: 0;
+  padding: 40px 0 0;
+}
+#boxer.mobile .boxer-close,
+#boxer.mobile .boxer-close:hover {
+  height: 40px;
+  width: 40px;
   top: 0;
+  right: 0;
+  background: #111111;
+  border-radius: 0;
+}
+#boxer.mobile .boxer-close:before,
+#boxer.mobile .boxer-close:hover:before {
+  color: #cccccc;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 40px;
 }
 #boxer.mobile .boxer-container {
-  background: #000;
+  background: #111111;
   position: relative;
 }
 #boxer.mobile .boxer-content {
-  background-color: #000;
+  background-color: #111111;
 }
 #boxer.mobile .boxer-control {
-  background-color: transparent;
+  width: 50px;
+  height: 100%;
+  background: #111111;
   border-radius: 0;
   box-shadow: none;
-  margin: -20px 0 0;
-  top: 50%;
+  opacity: 1;
 }
 #boxer.mobile .boxer-control.previous {
-  background-position: 0 -40px;
-  float: left;
   left: 0;
+}
+#boxer.mobile .boxer-control.previous:before {
+  border-right-color: #eeeeee;
+  margin-left: 19px;
 }
 #boxer.mobile .boxer-control.next {
-  background-position: -40px -40px;
-  float: right;
   right: 0;
 }
-#boxer.mobile .boxer-control.disabled {
-  opacity: 0.3;
+#boxer.mobile .boxer-control.next:before {
+  border-left-color: #eeeeee;
+  margin-right: 19px;
 }
-@media screen and (min-width: 980px) {
-  #boxer.mobile .boxer-control {
-    opacity: 1 !important;
-  }
-  #boxer.mobile .boxer-control.disabled {
-    opacity: 0.3 !important;
-  }
+#boxer.mobile .boxer-control.disabled {
+  opacity: 0;
+}
+.no-touch #boxer.mobile .boxer-control,
+.no-touch #boxer.mobile:hover .boxer-control {
+  opacity: 1;
+}
+.no-touch #boxer.mobile .boxer-control:hover,
+.no-touch #boxer.mobile:hover .boxer-control:hover {
+  opacity: 1;
+}
+.no-touch #boxer.mobile .boxer-control.disabled,
+.no-touch #boxer.mobile:hover .boxer-control.disabled {
+  opacity: 0;
 }
 #boxer.mobile .boxer-meta {
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.75);
-  left: 0;
-  padding: 15px 50px 10px;
-  position: absolute;
   width: 100%;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #111111;
+  padding: 15px 65px;
 }
 #boxer.mobile .boxer-position {
-  padding: 0;
+  color: #999999;
+  font-size: 12px;
+  margin: 0;
+  padding: 0 15px 0 0;
 }
 #boxer.mobile .boxer-caption p {
-  color: #eee;
-  padding: 10px 0 0;
+  color: #eeeeee;
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
 }
 #boxer.mobile .boxer-image {
   -webkit-transition: none !important;
           transition: none !important;
-  -webkit-transform: translate(0px, 0px);
-      -ms-transform: translate(0px, 0px);
-          transform: translate(0px, 0px);
+  -webkit-transform: translate(0, 0);
+      -ms-transform: translate(0, 0);
+          transform: translate(0, 0);
 }
 #boxer.mobile.animated .boxer-image {
   -webkit-transition: -webkit-transform 0.25s ease-out !important;
           transition: transform 0.25s ease-out !important;
 }
 #boxer.mobile.loading .boxer-container {
-  background: #000000 url(jquery.fs.boxer-loading-dark.gif) no-repeat center;
+  background: #111111 url(jquery.fs.boxer-loading-dark.gif) no-repeat center;
 }
 #boxer.mobile.inline .boxer-content,
 #boxer.mobile.iframe .boxer-content {
