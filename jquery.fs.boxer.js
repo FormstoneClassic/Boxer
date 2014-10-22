@@ -1,5 +1,5 @@
 /* 
- * Boxer v3.2.4 - 2014-10-22 
+ * Boxer v3.2.5 - 2014-10-22 
  * A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library. 
  * http://formstone.it/boxer/ 
  * 
@@ -165,189 +165,196 @@
 	 * @param e [object] "Event data"
 	 */
 	function _build(e) {
-		// Check target type
-		var $target = $(this),
-			$object = e.data.$object,
-			source = ($target[0].href) ? $target[0].href || "" : "",
-			sourceParts = source.toLowerCase().split(".").pop().split(/\#|\?/),
-			extension = sourceParts[0],
-			type = $target.data("boxer-type") || "",
-			isImage	= ( (type === "image") || ($.inArray(extension, e.data.extensions) > -1 || source.substr(0, 10) === "data:image") ),
-			isVideo	= ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 ),
-			isUrl	  = ( (type === "url") || (!isImage && !isVideo && source.substr(0, 4) === "http") ),
-			isElement  = ( (type === "element") || (!isImage && !isVideo && !isUrl && source.substr(0, 1) === "#") ),
-			isObject   = ( (typeof $object !== "undefined") );
+		if (typeof data.$boxer === "undefined") {
+			// Check target type
+			var $target = $(this),
+				$object = e.data.$object,
+				source = ($target[0].href) ? $target[0].href || "" : "",
+				hash = ($target[0].hash) ? $target[0].hash || "" : "",
+				sourceParts = source.toLowerCase().split(".").pop().split(/\#|\?/),
+				extension = sourceParts[0],
+				type = $target.data("boxer-type") || "",
+				isImage	= ( (type === "image") || ($.inArray(extension, e.data.extensions) > -1 || source.substr(0, 10) === "data:image") ),
+				isVideo	= ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 ),
+				isUrl	  = ( (type === "url") || (!isImage && !isVideo && source.substr(0, 4) === "http" && !hash) ),
+				isElement  = ( (type === "element") || (!isImage && !isVideo && !isUrl && (hash.substr(0, 1) === "#")) ),
+				isObject   = ( (typeof $object !== "undefined") );
 
-		// Check if boxer is already active, retain default click
-		if ($("#boxer").length > 1 || !(isImage || isVideo || isUrl || isElement || isObject)) {
-			return;
-		}
-
-		// Kill event
-		_killEvent(e);
-
-		// Cache internal data
-		data = $.extend({}, {
-			$window: $(window),
-			$body: $("body"),
-			$target: $target,
-			$object: $object,
-			visible: false,
-			resizeTimer: null,
-			touchTimer: null,
-			gallery: {
-				active: false
-			},
-			isMobile: (trueMobile || e.data.mobile),
-			isAnimating: true,
-			/*
-			oldContainerHeight: 0,
-			oldContainerWidth: 0,
-			*/
-			oldContentHeight: 0,
-			oldContentWidth: 0
-		}, e.data);
-
-		// Double the margin
-		data.margin *= 2;
-		data.containerHeight = data.height;
-		data.containerWidth  = data.width;
-
-		if (isImage) {
-			data.type = "image";
-		} else if (isVideo) {
-			data.type = "video";
-		} else {
-			data.type = "element";
-		}
-
-		if (isImage || isVideo) {
-			// Check for gallery
-			var id = data.$target.data("gallery") || data.$target.attr("rel"); // backwards compatibility
-
-			if (typeof id !== "undefined" && id !== false) {
-				data.gallery.active = true;
-				data.gallery.id = id;
-				data.gallery.$items = $("a[data-gallery= " + data.gallery.id + "], a[rel= " + data.gallery.id + "]"); // backwards compatibility
-				data.gallery.index = data.gallery.$items.index(data.$target);
-				data.gallery.total = data.gallery.$items.length - 1;
-			}
-		}
-
-		// Assemble HTML
-		var html = '';
-		if (!data.isMobile) {
-			html += '<div id="boxer-overlay" class="' + data.customClass + '"></div>';
-		}
-		html += '<div id="boxer" class="loading animating ' + data.customClass;
-		if (data.isMobile) {
-			html += ' mobile';
-		}
-		if (isUrl) {
-			html += ' iframe';
-		}
-		if (isElement || isObject) {
-			html += ' inline';
-		}
-		html += '"';
-		if (data.fixed === true) {
-			html += ' style="position: fixed;"';
-		}
-		html += '>';
-		html += '<span class="boxer-close">' + data.labels.close + '</span>';
-		html += '<span class="boxer-loading"></span>';
-		html += '<div class="boxer-container" style="';
-		if (data.isMobile) {
-			html += 'height: 100%; width: 100%';
-		} else {
-			html += 'height: ' + data.height + 'px; width: ' + data.width + 'px';
-		}
-		html += '">';
-		html += '<div class="boxer-content">';
-		if (isImage || isVideo) {
-			html += '<div class="boxer-meta">';
-
-			if (data.gallery.active) {
-				html += '<div class="boxer-control previous">' + data.labels.previous + '</div>';
-				html += '<div class="boxer-control next">' + data.labels.next + '</div>';
-				html += '<p class="boxer-position"';
-				if (data.gallery.total < 1) {
-					html += ' style="display: none;"';
-				}
-				html += '>';
-				html += '<span class="current">' + (data.gallery.index + 1) + '</span> ' + data.labels.count + ' <span class="total">' + (data.gallery.total + 1) + '</span>';
-				html += '</p>';
-				html += '<div class="boxer-caption gallery">';
-			} else {
-				html += '<div class="boxer-caption">';
+			if (isElement) {
+				source = hash;
 			}
 
-			html += data.formatter.apply(data.$body, [data.$target]);
-			html += '</div></div>'; // caption, meta
-		}
-		html += '</div></div></div>'; //container, content, boxer
+			// Check if boxer is already active, retain default click
+			if ($("#boxer").length > 1 || !(isImage || isVideo || isUrl || isElement || isObject)) {
+				return;
+			}
 
-		// Modify Dom
-		data.$body.append(html);
-
-		// Cache jquery objects
-		data.$overlay = $("#boxer-overlay");
-		data.$boxer = $("#boxer");
-		data.$container = data.$boxer.find(".boxer-container");
-		data.$content = data.$boxer.find(".boxer-content");
-		data.$meta = data.$boxer.find(".boxer-meta");
-		data.$position = data.$boxer.find(".boxer-position");
-		data.$caption = data.$boxer.find(".boxer-caption");
-		data.$controls = data.$boxer.find(".boxer-control");
-		data.paddingVertical = parseInt(data.$boxer.css("paddingTop"), 10) + parseInt(data.$boxer.css("paddingBottom"), 10);
-		data.paddingHorizontal = parseInt(data.$boxer.css("paddingLeft"), 10) + parseInt(data.$boxer.css("paddingRight"), 10);
-
-		// Center / update gallery
-		_center();
-		if (data.gallery.active) {
-			_updateControls();
-		}
-
-		// Bind events
-		data.$window.on("resize.boxer", pub.resize)
-					.on("keydown.boxer", _onKeypress);
-		data.$body.on("touchstart.boxer click.boxer", "#boxer-overlay, #boxer .boxer-close", _onClose)
-				  .on("touchmove.boxer", _killEvent);
-
-		if (data.gallery.active) {
-			data.$boxer.on("touchstart.boxer click.boxer", ".boxer-control", _advanceGallery);
-		}
-
-		data.$boxer.on(transitionEvent, function(e) {
+			// Kill event
 			_killEvent(e);
 
-			if ($(e.target).is(data.$boxer)) {
-				data.$boxer.off(transitionEvent);
+			// Cache internal data
+			data = $.extend({}, {
+				$window: $(window),
+				$body: $("body"),
+				$target: $target,
+				$object: $object,
+				visible: false,
+				resizeTimer: null,
+				touchTimer: null,
+				gallery: {
+					active: false
+				},
+				isMobile: (trueMobile || e.data.mobile),
+				isAnimating: true,
+				/*
+				oldContainerHeight: 0,
+				oldContainerWidth: 0,
+				*/
+				oldContentHeight: 0,
+				oldContentWidth: 0
+			}, e.data);
 
-				if (isImage) {
-					_loadImage(source);
-				} else if (isVideo) {
-					_loadVideo(source);
-				} else if (isUrl) {
-					_loadURL(source);
-				} else if (isElement) {
-					_cloneElement(source);
-				} else if (isObject) {
-					_appendObject(data.$object);
-				} else {
-					$.error("BOXER: '" +  source + "' is not valid.");
+			// Double the margin
+			data.margin *= 2;
+			data.containerHeight = data.height;
+			data.containerWidth  = data.width;
+
+			if (isImage) {
+				data.type = "image";
+			} else if (isVideo) {
+				data.type = "video";
+			} else {
+				data.type = "element";
+			}
+
+			if (isImage || isVideo) {
+				// Check for gallery
+				var id = data.$target.data("gallery") || data.$target.attr("rel"); // backwards compatibility
+
+				if (typeof id !== "undefined" && id !== false) {
+					data.gallery.active = true;
+					data.gallery.id = id;
+					data.gallery.$items = $("a[data-gallery= " + data.gallery.id + "], a[rel= " + data.gallery.id + "]"); // backwards compatibility
+					data.gallery.index = data.gallery.$items.index(data.$target);
+					data.gallery.total = data.gallery.$items.length - 1;
 				}
 			}
-		});
 
-		$body.addClass("boxer-open");
+			// Assemble HTML
+			var html = '';
+			if (!data.isMobile) {
+				html += '<div id="boxer-overlay" class="' + data.customClass + '"></div>';
+			}
+			html += '<div id="boxer" class="loading animating ' + data.customClass;
+			if (data.isMobile) {
+				html += ' mobile';
+			}
+			if (isUrl) {
+				html += ' iframe';
+			}
+			if (isElement || isObject) {
+				html += ' inline';
+			}
+			html += '"';
+			if (data.fixed === true) {
+				html += ' style="position: fixed;"';
+			}
+			html += '>';
+			html += '<span class="boxer-close">' + data.labels.close + '</span>';
+			html += '<span class="boxer-loading"></span>';
+			html += '<div class="boxer-container" style="';
+			if (data.isMobile) {
+				html += 'height: 100%; width: 100%';
+			} else {
+				html += 'height: ' + data.height + 'px; width: ' + data.width + 'px';
+			}
+			html += '">';
+			html += '<div class="boxer-content">';
+			if (isImage || isVideo) {
+				html += '<div class="boxer-meta">';
 
-		if (!transitionSupported) {
-			data.$boxer.trigger(transitionEvent);
-		}
+				if (data.gallery.active) {
+					html += '<div class="boxer-control previous">' + data.labels.previous + '</div>';
+					html += '<div class="boxer-control next">' + data.labels.next + '</div>';
+					html += '<p class="boxer-position"';
+					if (data.gallery.total < 1) {
+						html += ' style="display: none;"';
+					}
+					html += '>';
+					html += '<span class="current">' + (data.gallery.index + 1) + '</span> ' + data.labels.count + ' <span class="total">' + (data.gallery.total + 1) + '</span>';
+					html += '</p>';
+					html += '<div class="boxer-caption gallery">';
+				} else {
+					html += '<div class="boxer-caption">';
+				}
 
-		if (isObject) {
-			return data.$boxer;
+				html += data.formatter.apply(data.$body, [data.$target]);
+				html += '</div></div>'; // caption, meta
+			}
+			html += '</div></div></div>'; //container, content, boxer
+
+			// Modify Dom
+			data.$body.append(html);
+
+			// Cache jquery objects
+			data.$overlay = $("#boxer-overlay");
+			data.$boxer = $("#boxer");
+			data.$container = data.$boxer.find(".boxer-container");
+			data.$content = data.$boxer.find(".boxer-content");
+			data.$meta = data.$boxer.find(".boxer-meta");
+			data.$position = data.$boxer.find(".boxer-position");
+			data.$caption = data.$boxer.find(".boxer-caption");
+			data.$controls = data.$boxer.find(".boxer-control");
+			data.paddingVertical = parseInt(data.$boxer.css("paddingTop"), 10) + parseInt(data.$boxer.css("paddingBottom"), 10);
+			data.paddingHorizontal = parseInt(data.$boxer.css("paddingLeft"), 10) + parseInt(data.$boxer.css("paddingRight"), 10);
+
+			// Center / update gallery
+			_center();
+			if (data.gallery.active) {
+				_updateControls();
+			}
+
+			// Bind events
+			data.$window.on("resize.boxer", pub.resize)
+						.on("keydown.boxer", _onKeypress);
+			data.$body.on("touchstart.boxer click.boxer", "#boxer-overlay, #boxer .boxer-close", _onClose)
+					  .on("touchmove.boxer", _killEvent);
+
+			if (data.gallery.active) {
+				data.$boxer.on("touchstart.boxer click.boxer", ".boxer-control", _advanceGallery);
+			}
+
+			data.$boxer.on(transitionEvent, function(e) {
+				_killEvent(e);
+
+				if ($(e.target).is(data.$boxer)) {
+					data.$boxer.off(transitionEvent);
+
+					if (isImage) {
+						_loadImage(source);
+					} else if (isVideo) {
+						_loadVideo(source);
+					} else if (isUrl) {
+						_loadURL(source);
+					} else if (isElement) {
+						_cloneElement(source);
+					} else if (isObject) {
+						_appendObject(data.$object);
+					} else {
+						$.error("BOXER: '" +  source + "' is not valid.");
+					}
+				}
+			});
+
+			$body.addClass("boxer-open");
+
+			if (!transitionSupported) {
+				data.$boxer.trigger(transitionEvent);
+			}
+
+			if (isObject) {
+				return data.$boxer;
+			}
 		}
 	}
 
@@ -361,7 +368,6 @@
 		_killEvent(e);
 
 		if (typeof data.$boxer !== "undefined") {
-
 			data.$boxer.on(transitionEvent, function(e) {
 				_killEvent(e);
 
@@ -371,6 +377,7 @@
 					data.$overlay.remove();
 					data.$boxer.remove();
 
+					// reset data
 					data = {};
 				}
 			}).addClass("animating");
