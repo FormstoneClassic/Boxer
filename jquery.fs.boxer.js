@@ -255,6 +255,7 @@
 		}
 		html += '>';
 		html += '<span class="boxer-close">' + data.labels.close + '</span>';
+		html += '<span class="boxer-loading"></span>';
 		html += '<div class="boxer-container" style="';
 		if (data.isMobile) {
 			html += 'height: 100%; width: 100%';
