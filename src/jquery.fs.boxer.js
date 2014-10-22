@@ -160,10 +160,10 @@
 		// Check target type
 		var $target = $(this),
 			$object = e.data.$object,
-			source = ($target[0].attributes) ? $target.attr("href") || "" : "",
+			source = ($target[0].href) ? $target[0].href || "" : "",
 			sourceParts = source.toLowerCase().split(".").pop().split(/\#|\?/),
 			extension = sourceParts[0],
-			type = '', // $target.data("type") || "";
+			type = $target.data("boxer-type") || "",
 			isImage	= ( (type === "image") || ($.inArray(extension, e.data.extensions) > -1 || source.substr(0, 10) === "data:image") ),
 			isVideo	= ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 ),
 			isUrl	  = ( (type === "url") || (!isImage && !isVideo && source.substr(0, 4) === "http") ),
