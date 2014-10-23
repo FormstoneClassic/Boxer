@@ -1,5 +1,5 @@
 /* 
- * Boxer v3.2.5 - 2014-10-22 
+ * Boxer v3.3.0 - 2014-10-22 
  * A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library. 
  * http://formstone.it/boxer/ 
  * 
@@ -27,12 +27,17 @@
   opacity: 0.75;
 }
 #boxer {
+  width: 200px;
+  height: 200px;
   position: absolute;
+  right: 0;
+  left: 0;
   z-index: 101;
   background: #ffffff;
   border-radius: 3px;
   box-shadow: 0 0 25px #000000;
   opacity: 0;
+  margin: 0 auto;
   padding: 10px;
 }
 #boxer,
@@ -49,25 +54,27 @@
   -moz-box-sizing: border-box;
        box-sizing: border-box;
 }
+#boxer.fixed {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
 #boxer.inline {
   padding: 30px;
 }
 #boxer.animating {
-  -webkit-transition: left 0.25s ease, opacity 0.25s linear, top 0.25s ease;
-          transition: left 0.25s ease, opacity 0.25s linear, top 0.25s ease;
+  -webkit-transition: height 0.25s ease, width 0.25s ease, opacity 0.25s linear, top 0.25s ease;
+          transition: height 0.25s ease, width 0.25s ease, opacity 0.25s linear, top 0.25s ease;
 }
 #boxer.animating .boxer-container {
-  -webkit-transition: height 0.25s ease, width 0.25s ease;
-          transition: height 0.25s ease, width 0.25s ease;
-}
-#boxer.animating .boxer-content {
   -webkit-transition: opacity 0.25s linear 0.25s;
           transition: opacity 0.25s linear 0.25s;
 }
 .boxer-open #boxer {
   opacity: 1;
 }
-#boxer.loading .boxer-content {
+#boxer.loading .boxer-container {
   opacity: 0;
   -webkit-transition: opacity 0.25s linear;
           transition: opacity 0.25s linear;
@@ -182,11 +189,15 @@
   overflow: hidden;
 }
 #boxer .boxer-content {
-  width: 10000px;
+  width: 100%;
   background: #ffffff;
   opacity: 1;
   overflow: hidden;
   padding: 0;
+}
+#boxer.inline .boxer-content,
+#boxer.iframe .boxer-content {
+  width: auto;
 }
 #boxer .boxer-image {
   float: left;
@@ -334,7 +345,6 @@
 }
 #boxer.mobile .boxer-container {
   background: #111111;
-  position: relative;
 }
 #boxer.mobile .boxer-content {
   background-color: #111111;

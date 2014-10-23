@@ -1,5 +1,5 @@
 /* 
- * Boxer v3.2.5 - 2014-10-22 
+ * Boxer v3.3.0 - 2014-10-22 
  * A jQuery plugin for displaying images, videos or content in a modal overlay. Part of the Formstone Library. 
  * http://formstone.it/boxer/ 
  * 
@@ -22,7 +22,6 @@
 	 * @param extensions [array] <"jpg", "sjpg", "jpeg", "png", "gif"> "Image type extensions"
 	 * @param fixed [boolean] <false> "Flag for fixed positioning"
 	 * @param formatter [function] <$.noop> "Caption format function"
-	 * @param height [int] <100> "Initial height (while loading)"
 	 * @param labels.close [string] <'Close'> "Close button text"
 	 * @param labels.count [string] <'of'> "Gallery count separator text"
 	 * @param labels.next [string] <'Next'> "Gallery control text"
@@ -37,7 +36,6 @@
 	 * @param top [int] <0> "Target top position; over-rides centering"
 	 * @param videoRadio [number] <0.5625> "Video height / width ratio (9 / 16 = 0.5625)"
 	 * @param videoWidth [int] <600> "Video target width"
-	 * @param width [int] <100> "Initial height (while loading)"
 	 */
 	var options = {
 		callback: $.noop,
@@ -45,7 +43,6 @@
 		extensions: [ "jpg", "sjpg", "jpeg", "png", "gif" ],
 		fixed: false,
 		formatter: $.noop,
-		height: 100,
 		labels: {
 			close: "Close",
 			count: "of",
@@ -61,8 +58,7 @@
 		requestKey: "boxer",
 		top: 0,
 		videoRatio: 0.5625,
-		videoWidth: 600,
-		width: 100
+		videoWidth: 600
 	};
 
 	/**
@@ -124,13 +120,13 @@
 				}
 
 				if (data.type === "element") {
-					_sizeContent(data.$content.find(">:first-child"));
+					sizeContent(data.$content.find(">:first-child"));
 				} else if (data.type === "image") {
-					_sizeImage();
+					sizeImage();
 				} else if (data.type === "video") {
-					_sizeVideo();
+					sizeVideo();
 				}
-				_size();
+				size();
 			}
 
 			return $(this);
@@ -139,15 +135,15 @@
 
 	/**
 	 * @method private
-	 * @name _init
+	 * @name init
 	 * @description Initializes plugin
 	 * @param opts [object] "Initialization options"
 	 */
-	function _init(opts) {
-		options.formatter = _formatCaption;
+	function init(opts) {
+		options.formatter = formatCaption;
 
 		$body = $("body");
-		transitionEvent = _getTransitionEvent();
+		transitionEvent = getTransitionEvent();
 		transitionSupported = (transitionEvent !== false);
 
 		// no transitions :(
@@ -155,16 +151,16 @@
 			transitionEvent = "transitionend.boxer";
 		}
 
-		return $(this).on("click.boxer", $.extend({}, options, opts || {}), _build);
+		return $(this).on("click.boxer", $.extend({}, options, opts || {}), build);
 	}
 
 	/**
 	 * @method private
-	 * @name _build
+	 * @name build
 	 * @description Builds target instance
 	 * @param e [object] "Event data"
 	 */
-	function _build(e) {
+	function build(e) {
 		if (typeof data.$boxer === "undefined") {
 			// Check target type
 			var $target = $(this),
@@ -190,7 +186,7 @@
 			}
 
 			// Kill event
-			_killEvent(e);
+			killEvent(e);
 
 			// Cache internal data
 			data = $.extend({}, {
@@ -206,18 +202,12 @@
 				},
 				isMobile: (trueMobile || e.data.mobile),
 				isAnimating: true,
-				/*
-				oldContainerHeight: 0,
-				oldContainerWidth: 0,
-				*/
 				oldContentHeight: 0,
 				oldContentWidth: 0
 			}, e.data);
 
 			// Double the margin
 			data.margin *= 2;
-			data.containerHeight = data.height;
-			data.containerWidth  = data.width;
 
 			if (isImage) {
 				data.type = "image";
@@ -246,6 +236,9 @@
 				html += '<div id="boxer-overlay" class="' + data.customClass + '"></div>';
 			}
 			html += '<div id="boxer" class="loading animating ' + data.customClass;
+			if (data.fixed) {
+				html += ' fixed';
+			}
 			if (data.isMobile) {
 				html += ' mobile';
 			}
@@ -255,20 +248,10 @@
 			if (isElement || isObject) {
 				html += ' inline';
 			}
-			html += '"';
-			if (data.fixed === true) {
-				html += ' style="position: fixed;"';
-			}
-			html += '>';
+			html += '">';
 			html += '<span class="boxer-close">' + data.labels.close + '</span>';
 			html += '<span class="boxer-loading"></span>';
-			html += '<div class="boxer-container" style="';
-			if (data.isMobile) {
-				html += 'height: 100%; width: 100%';
-			} else {
-				html += 'height: ' + data.height + 'px; width: ' + data.width + 'px';
-			}
-			html += '">';
+			html += '<div class="boxer-container">';
 			html += '<div class="boxer-content">';
 			if (isImage || isVideo) {
 				html += '<div class="boxer-meta">';
@@ -305,41 +288,48 @@
 			data.$position = data.$boxer.find(".boxer-position");
 			data.$caption = data.$boxer.find(".boxer-caption");
 			data.$controls = data.$boxer.find(".boxer-control");
-			data.paddingVertical = parseInt(data.$boxer.css("paddingTop"), 10) + parseInt(data.$boxer.css("paddingBottom"), 10);
-			data.paddingHorizontal = parseInt(data.$boxer.css("paddingLeft"), 10) + parseInt(data.$boxer.css("paddingRight"), 10);
 
-			// Center / update gallery
-			_center();
+			data.paddingVertical = (!data.isMobile) ? (parseInt(data.$boxer.css("paddingTop"), 10) + parseInt(data.$boxer.css("paddingBottom"), 10)) : (data.$boxer.find(".boxer-close").outerHeight() / 2);
+			data.paddingHorizontal = (!data.isMobile) ? (parseInt(data.$boxer.css("paddingLeft"), 10) + parseInt(data.$boxer.css("paddingRight"), 10)) : 0;
+			data.contentHeight = data.$boxer.outerHeight() - data.paddingVertical;
+			data.contentWidth = data.$boxer.outerWidth()   - data.paddingHorizontal;
+			data.controlHeight = data.$controls.outerHeight();
+
+			// Center
+			center();
+
+			// Update gallery
 			if (data.gallery.active) {
-				_updateControls();
+				updateControls();
 			}
 
 			// Bind events
 			data.$window.on("resize.boxer", pub.resize)
-						.on("keydown.boxer", _onKeypress);
-			data.$body.on("touchstart.boxer click.boxer", "#boxer-overlay, #boxer .boxer-close", _onClose)
-					  .on("touchmove.boxer", _killEvent);
+						.on("keydown.boxer", onKeypress);
+
+			data.$body.on("touchstart.boxer click.boxer", "#boxer-overlay, #boxer .boxer-close", onClose)
+					  .on("touchmove.boxer", killEvent);
 
 			if (data.gallery.active) {
-				data.$boxer.on("touchstart.boxer click.boxer", ".boxer-control", _advanceGallery);
+				data.$boxer.on("touchstart.boxer click.boxer", ".boxer-control", advanceGallery);
 			}
 
 			data.$boxer.on(transitionEvent, function(e) {
-				_killEvent(e);
+				killEvent(e);
 
 				if ($(e.target).is(data.$boxer)) {
 					data.$boxer.off(transitionEvent);
 
 					if (isImage) {
-						_loadImage(source);
+						loadImage(source);
 					} else if (isVideo) {
-						_loadVideo(source);
+						loadVideo(source);
 					} else if (isUrl) {
-						_loadURL(source);
+						loadURL(source);
 					} else if (isElement) {
-						_cloneElement(source);
+						cloneElement(source);
 					} else if (isObject) {
-						_appendObject(data.$object);
+						appendObject(data.$object);
 					} else {
 						$.error("BOXER: '" +  source + "' is not valid.");
 					}
@@ -360,16 +350,16 @@
 
 	/**
 	 * @method private
-	 * @name _onClose
+	 * @name onClose
 	 * @description Closes active instance
 	 * @param e [object] "Event data"
 	 */
-	function _onClose(e) {
-		_killEvent(e);
+	function onClose(e) {
+		killEvent(e);
 
 		if (typeof data.$boxer !== "undefined") {
 			data.$boxer.on(transitionEvent, function(e) {
-				_killEvent(e);
+				killEvent(e);
 
 				if ($(e.target).is(data.$boxer)) {
 					data.$boxer.off(transitionEvent);
@@ -388,7 +378,7 @@
 				data.$boxer.trigger(transitionEvent);
 			}
 
-			_clearTimer(data.resizeTimer);
+			clearTimer(data.resizeTimer);
 
 			// Clean up
 			data.$window.off("resize.boxer")
@@ -413,45 +403,38 @@
 
 	/**
 	 * @method private
-	 * @name _open
+	 * @name open
 	 * @description Opens active instance
 	 */
-	function _open() {
-		var position = _position(),
-			controlHeight = 0,
+	function open() {
+		var position = calculatePosition(),
 			durration = data.isMobile ? 0 : data.duration;
 
 		if (!data.isMobile) {
-			controlHeight = data.$controls.outerHeight();
 			data.$controls.css({
-				marginTop: ((data.contentHeight - controlHeight) / 2)
+				marginTop: ((data.contentHeight - data.controlHeight - data.metaHeight) / 2)
 			});
 		}
 
 		if (!data.visible && data.isMobile && data.gallery.active) {
-			data.$content.on("touchstart.boxer", ".boxer-image", _onTouchStart);
+			data.$content.on("touchstart.boxer", ".boxer-image", onTouchStart);
 		}
 
 		if (data.isMobile || data.fixed) {
 			data.$body.addClass("boxer-open");
 		}
 
-		data.$boxer.css({
-			left: position.left,
-			top:  position.top
-		});
+		data.$boxer.on(transitionEvent, function(e) {
+			killEvent(e);
 
-		data.$container.on(transitionEvent, function(e) {
-			_killEvent(e);
+			if ($(e.target).is(data.$boxer)) {
+				data.$boxer.off(transitionEvent);
 
-			if ($(e.target).is(data.$container)) {
-				data.$container.off(transitionEvent);
+				data.$container.on(transitionEvent, function(e) {
+					killEvent(e);
 
-				data.$content.on(transitionEvent, function(e) {
-					_killEvent(e);
-
-					if ($(e.target).is(data.$content)) {
-						data.$content.off(transitionEvent);
+					if ($(e.target).is(data.$container)) {
+						data.$container.off(transitionEvent);
 
 						data.$boxer.removeClass("animating");
 
@@ -473,102 +456,82 @@
 
 				// Start preloading
 				if (data.gallery.active) {
-					_preloadGallery();
+					preloadGallery();
 				}
 			}
-		}).css({
-			height: data.containerHeight,
-			width:  data.containerWidth
 		});
 
-		/* var containerHasChanged = (data.oldContainerHeight !== data.containerHeight || data.oldContainerWidth !== data.containerWidth), */
-		var contentHasChanged   = (data.oldContentHeight !== data.contentHeight || data.oldContentWidth !== data.contentWidth);
-
-		if (data.isMobile || !transitionSupported || !contentHasChanged /* || !containerHasChanged */) {
-			data.$container.trigger(transitionEvent);
+		if (!data.isMobile) {
+			data.$boxer.css({
+				height: data.contentHeight + data.paddingVertical,
+				width:  data.contentWidth  + data.paddingHorizontal,
+				top:    (!data.fixed) ? position.top : 0
+			});
 		}
 
-		// tracking changes
-		/*
-		data.oldContainerHeight = data.containerHeight;
-		data.oldContainerWidth  = data.containerWidth;
-		*/
+		// Trigger event in case the content size hasn't changed
+		var contentHasChanged = (data.oldContentHeight !== data.contentHeight || data.oldContentWidth !== data.contentWidth);
+
+		if (data.isMobile || !transitionSupported || !contentHasChanged) {
+			data.$boxer.trigger(transitionEvent);
+		}
+
+		// Track content size changes
 		data.oldContentHeight = data.contentHeight;
 		data.oldContentWidth  = data.contentWidth;
 	}
 
 	/**
 	 * @method private
-	 * @name _size
+	 * @name size
 	 * @description Sizes active instance
-	 * @param animate [boolean] <false> "Flag to animate sizing"
 	 */
-	function _size(animate) {
-		animate = animate || false;
+	function size() {
+		if (data.visible && !data.isMobile) {
+			var position = calculatePosition();
 
-		if (data.visible) {
-			var position = _position(),
-				controlHeight = 0;
+			data.$controls.css({
+				marginTop: ((data.contentHeight - data.controlHeight - data.metaHeight) / 2)
+			});
 
-			if (!data.isMobile) {
-				controlHeight = data.$controls.outerHeight();
-				data.$controls.css({
-					marginTop: ((data.contentHeight - controlHeight) / 2)
-				});
-			}
-
-			/*
-			if (animate) {
-				data.$boxer.css({
-					left: position.left,
-					top:  position.top
-				}, data.duration);
-
-				data.$container.css({
-					height: data.containerHeight,
-					width:  data.containerWidth
-				});
-			} else {
-			*/
-				data.$boxer.css({
-					left: position.left,
-					top:  position.top
-				});
-				data.$container.css({
-					height: data.containerHeight,
-					width:  data.containerWidth
-				});
-			/* } */
+			data.$boxer.css({
+				height: data.contentHeight + data.paddingVertical,
+				width:  data.contentWidth  + data.paddingHorizontal,
+				top:    (!data.fixed) ? position.top : 0
+			});
 		}
 	}
 
 	/**
 	 * @method private
-	 * @name _center
+	 * @name center
 	 * @description Centers instance
 	 */
-	function _center() {
-		var position = _position();
+	function center() {
+		var position = calculatePosition();
+
 		data.$boxer.css({
-			left: position.left,
-			top:  position.top
+			top: (!data.fixed) ? position.top : 0
 		});
 	}
 
 	/**
 	 * @method private
-	 * @name _position
+	 * @name calculatePosition
 	 * @description Calculates positions
 	 * @return [object] "Object containing top and left positions"
 	 */
-	function _position() {
+	function calculatePosition() {
 		if (data.isMobile) {
-			return { left: 0, top: 0 };
+			return {
+				left: 0,
+				top: 0
+			};
 		}
 
 		var pos = {
-			left: (data.$window.width() - data.containerWidth - data.paddingHorizontal) / 2,
-			top: (data.top <= 0) ? ((data.$window.height() - data.containerHeight - data.paddingVertical) / 2) : data.top
+			left: (data.$window.width() - data.contentWidth - data.paddingHorizontal) / 2,
+			top: (data.top <= 0) ? ((data.$window.height() - data.contentHeight - data.paddingVertical) / 2) : data.top
 		};
 
 		if (data.fixed !== true) {
@@ -580,29 +543,29 @@
 
 	/**
 	 * @method private
-	 * @name _formatCaption
+	 * @name formatCaption
 	 * @description Formats caption
 	 * @param $target [jQuery object] "Target element"
 	 */
-	function _formatCaption($target) {
+	function formatCaption($target) {
 		var title = $target.attr("title");
-		return (title !== "" && title !== undefined) ? '<p class="caption">' + title + '</p>' : "";
+		return (title !== undefined && title.trim() !== "") ? '<p class="caption">' + title.trim() + '</p>' : "";
 	}
 
 	/**
 	 * @method private
-	 * @name _loadImage
+	 * @name loadImage
 	 * @description Loads source image
 	 * @param source [string] "Source image URL"
 	 */
-	function _loadImage(source) {
+	function loadImage(source) {
 		// Cache current image
 		data.$image = $("<img />");
 
 		data.$image.load(function() {
 			data.$image.off("load, error");
 
-			var naturalSize = _naturalSize(data.$image);
+			var naturalSize = calculateNaturalSize(data.$image);
 
 			data.naturalHeight = naturalSize.naturalHeight;
 			data.naturalWidth  = naturalSize.naturalWidth;
@@ -621,9 +584,9 @@
 			}
 
 			// Size content to be sure it fits the viewport
-			_sizeImage();
-			_open();
-		}).error(_loadError)
+			sizeImage();
+			open();
+		}).error(loadError)
 		  .attr("src", source)
 		  .addClass("boxer-image");
 
@@ -635,25 +598,23 @@
 
 	/**
 	 * @method private
-	 * @name _sizeImage
+	 * @name sizeImage
 	 * @description Sizes image to fit in viewport
 	 * @param count [int] "Number of resize attempts"
 	 */
-	function _sizeImage() {
+	function sizeImage() {
 		var count = 0;
 
-		data.windowHeight = data.viewportHeight = data.$window.height();
-		data.windowWidth  = data.viewportWidth  = data.$window.width();
+		data.windowHeight = data.viewportHeight = data.$window.height() - data.paddingVertical;
+		data.windowWidth  = data.viewportWidth  = data.$window.width()  - data.paddingHorizontal;
 
-		data.containerHeight = Infinity;
-		data.contentHeight = 0;
-		data.containerWidth  = Infinity;
-		data.contentWidth = 0;
+		data.contentHeight = Infinity;
+		data.contentWidth = Infinity;
 
 		data.imageMarginTop  = 0;
 		data.imageMarginLeft = 0;
 
-		while (data.containerHeight > data.viewportHeight && count < 2) {
+		while (data.contentHeight > data.viewportHeight && count < 2) {
 			data.imageHeight = (count === 0) ? data.naturalHeight : data.$image.outerHeight();
 			data.imageWidth  = (count === 0) ? data.naturalWidth  : data.$image.outerWidth();
 			data.metaHeight  = (count === 0) ? 0 : data.metaHeight;
@@ -681,39 +642,33 @@
 				data.metaHeight = data.$meta.outerHeight(true);
 
 				// Content match viewport
-				data.contentHeight = data.viewportHeight;
-				data.contentWidth  = data.viewportWidth;
+				data.contentHeight = data.viewportHeight - data.paddingVertical;
+				data.contentWidth  = data.viewportWidth  - data.paddingHorizontal;
 
-				// Container match viewport, less padding
-				data.containerHeight = data.viewportHeight - data.paddingVertical;
-				data.containerWidth  = data.viewportWidth  - data.paddingHorizontal;
+				fitImage();
 
-				_fitImage();
-
-				data.imageMarginTop  = (data.containerHeight - data.targetImageHeight - data.metaHeight) / 2;
-				data.imageMarginLeft = (data.containerWidth  - data.targetImageWidth) / 2;
+				data.imageMarginTop  = (data.contentHeight - data.targetImageHeight - data.metaHeight) / 2;
+				data.imageMarginLeft = (data.contentWidth  - data.targetImageWidth) / 2;
 			} else {
-				// Viewport match window, less margin, padding and meta
+				// Viewport should match window, less margin, padding and meta
 				if (count === 0) {
 					data.viewportHeight -= (data.margin + data.paddingVertical);
 					data.viewportWidth  -= (data.margin + data.paddingHorizontal);
 				}
 				data.viewportHeight -= data.metaHeight;
 
-				_fitImage();
+				fitImage();
 
-				data.containerHeight = data.contentHeight = data.targetImageHeight;
-				data.containerWidth  = data.contentWidth  = data.targetImageWidth;
+				data.contentHeight = data.targetImageHeight;
+				data.contentWidth  = data.targetImageWidth;
 			}
 
 			// Modify DOM
-			data.$content.css({
-				height: (data.isMobile) ? data.contentHeight : "auto",
-				width: data.contentWidth
-			});
+
 			data.$meta.css({
 				width: data.contentWidth
 			});
+
 			data.$image.css({
 				height: data.targetImageHeight,
 				width:  data.targetImageWidth,
@@ -723,7 +678,7 @@
 
 			if (!data.isMobile) {
 				data.metaHeight = data.$meta.outerHeight(true);
-				data.containerHeight += data.metaHeight;
+				data.contentHeight += data.metaHeight;
 			}
 
 			count ++;
@@ -732,12 +687,12 @@
 
 	/**
 	 * @method private
-	 * @name _fitImage
+	 * @name fitImage
 	 * @description Calculates target image size
 	 */
-	function _fitImage() {
-		var height = (!data.isMobile) ? data.viewportHeight : data.containerHeight - data.metaHeight,
-			width  = (!data.isMobile) ? data.viewportWidth  : data.containerWidth;
+	function fitImage() {
+		var height = (!data.isMobile) ? data.viewportHeight : data.contentHeight - data.metaHeight,
+			width  = (!data.isMobile) ? data.viewportWidth  : data.contentWidth;
 
 		if (data.isWide) {
 			//WIDE
@@ -779,11 +734,11 @@
 
 	/**
 	 * @method private
-	 * @name _loadVideo
+	 * @name loadVideo
 	 * @description Loads source video
 	 * @param source [string] "Source video URL"
 	 */
-	function _loadVideo(source) {
+	function loadVideo(source) {
 		data.$videoWrapper = $('<div class="boxer-video-wrapper" />');
 		data.$video = $('<iframe class="boxer-video" seamless="seamless" />');
 
@@ -793,16 +748,16 @@
 
 		data.$content.prepend(data.$videoWrapper);
 
-		_sizeVideo();
-		_open();
+		sizeVideo();
+		open();
 	}
 
 	/**
 	 * @method private
-	 * @name _sizeVideo
+	 * @name sizeVideo
 	 * @description Sizes video to fit in viewport
 	 */
-	function _sizeVideo() {
+	function sizeVideo() {
 		// Set initial vars
 		data.windowHeight = data.viewportHeight = data.contentHeight = data.$window.height() - data.paddingVertical;
 		data.windowWidth  = data.viewportWidth  = data.contentWidth  = data.$window.width()  - data.paddingHorizontal;
@@ -840,13 +795,12 @@
 			data.contentWidth  = data.targetVideoWidth;
 		}
 
-		data.$content.css({
-			height: (data.isMobile) ? data.contentHeight : "auto",
-			width: data.contentWidth
-		});
+		// Update dom
+
 		data.$meta.css({
 			width: data.contentWidth
 		});
+
 		data.$videoWrapper.css({
 			height: data.targetVideoHeight,
 			width: data.targetVideoWidth,
@@ -854,22 +808,19 @@
 			marginLeft: data.videoMarginLeft
 		});
 
-		data.containerHeight = data.contentHeight;
-		data.containerWidth  = data.contentWidth;
-
 		if (!data.isMobile) {
 			data.metaHeight = data.$meta.outerHeight(true);
-			data.containerHeight = data.targetVideoHeight + data.metaHeight;
+			data.contentHeight = data.targetVideoHeight + data.metaHeight;
 		}
 	}
 
 	/**
 	 * @method private
-	 * @name _preloadGallery
+	 * @name preloadGallery
 	 * @description Preloads previous and next images in gallery for faster rendering
 	 * @param e [object] "Event Data"
 	 */
-	function _preloadGallery(e) {
+	function preloadGallery(e) {
 		var source = '';
 
 		if (data.gallery.index > 0) {
@@ -888,12 +839,12 @@
 
 	/**
 	 * @method private
-	 * @name _advanceGallery
+	 * @name advanceGallery
 	 * @description Advances gallery base on direction
 	 * @param e [object] "Event Data"
 	 */
-	function _advanceGallery(e) {
-		_killEvent(e);
+	function advanceGallery(e) {
+		killEvent(e);
 
 		var $control = $(this);
 		if (!data.isAnimating && !$control.hasClass("disabled")) {
@@ -907,11 +858,11 @@
 				data.gallery.index = 0;
 			}
 
-			data.$content.on(transitionEvent, function(e) {
-				_killEvent(e);
+			data.$container.on(transitionEvent, function(e) {
+				killEvent(e);
 
-				if ($(e.target).is(data.$content)) {
-					data.$content.off(transitionEvent);
+				if ($(e.target).is(data.$container)) {
+					data.$container.off(transitionEvent);
 
 					if (typeof data.$image !== 'undefined') {
 						data.$image.remove();
@@ -928,11 +879,11 @@
 						isVideo = ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 );
 
 					if (isVideo) {
-						_loadVideo(source);
+						loadVideo(source);
 					} else {
-						_loadImage(source);
+						loadImage(source);
 					}
-					_updateControls();
+					updateControls();
 				}
 			});
 
@@ -946,10 +897,10 @@
 
 	/**
 	 * @method private
-	 * @name _updateControls
+	 * @name updateControls
 	 * @description Updates gallery control states
 	 */
-	function _updateControls() {
+	function updateControls() {
 		data.$controls.removeClass("disabled");
 		if (data.gallery.index === 0) {
 			data.$controls.filter(".previous").addClass("disabled");
@@ -961,13 +912,13 @@
 
 	/**
 	 * @method private
-	 * @name _onKeypress
+	 * @name onKeypress
 	 * @description Handles keypress in gallery
 	 * @param e [object] "Event data"
 	 */
-	function _onKeypress(e) {
+	function onKeypress(e) {
 		if (data.gallery.active && (e.keyCode === 37 || e.keyCode === 39)) {
-			_killEvent(e);
+			killEvent(e);
 
 			data.$controls.filter((e.keyCode === 37) ? ".previous" : ".next").trigger("click");
 		} else if (e.keyCode === 27) {
@@ -977,46 +928,46 @@
 
 	/**
 	 * @method private
-	 * @name _cloneElement
+	 * @name cloneElement
 	 * @description Clones target inline element
 	 * @param id [string] "Target element id"
 	 */
-	function _cloneElement(id) {
+	function cloneElement(id) {
 		var $clone = $(id).find(">:first-child").clone();
-		_appendObject($clone);
+		appendObject($clone);
 	}
 
 	/**
 	 * @method private
-	 * @name _loadURL
+	 * @name loadURL
 	 * @description Load URL into iframe
 	 * @param source [string] "Target URL"
 	 */
-	function _loadURL(source) {
+	function loadURL(source) {
 		source = source + ((source.indexOf("?") > -1) ? "&"+options.requestKey+"=true" : "?"+options.requestKey+"=true");
 		var $iframe = $('<iframe class="boxer-iframe" src="' + source + '" />');
-		_appendObject($iframe);
+		appendObject($iframe);
 	}
 
 	/**
 	 * @method private
-	 * @name _appendObject
+	 * @name appendObject
 	 * @description Appends and sizes object
 	 * @param $object [jQuery Object] "Object to append"
 	 */
-	function _appendObject($object) {
+	function appendObject($object) {
 		data.$content.append($object);
-		_sizeContent($object);
-		_open();
+		sizeContent($object);
+		open();
 	}
 
 	/**
 	 * @method private
-	 * @name _sizeContent
+	 * @name sizeContent
 	 * @description Sizes jQuery object to fir in viewport
 	 * @param $object [jQuery Object] "Object to size"
 	 */
-	function _sizeContent($object) {
+	function sizeContent($object) {
 		data.windowHeight	  = data.$window.height() - data.paddingVertical;
 		data.windowWidth	  = data.$window.width() - data.paddingHorizontal;
 		data.objectHeight	  = $object.outerHeight(true);
@@ -1043,33 +994,15 @@
 			data.contentHeight = (data.contentHeight > data.windowHeight) ? data.windowHeight : data.contentHeight;
 			data.contentWidth  = (data.contentWidth > data.windowWidth)   ? data.windowWidth  : data.contentWidth;
 		}
-
-		_setContentSize(data);
 	}
 
 	/**
 	 * @method private
-	 * @name _setContentSize
-	 * @description Sets content dimensions
-	 * @param data [object] "Instance data"
-	 */
-	function _setContentSize(data) {
-		data.containerHeight = data.contentHeight;
-		data.containerWidth  = data.contentWidth;
-
-		data.$content.css({
-			height: data.contentHeight,
-			width:  data.contentWidth
-		});
-	}
-
-	/**
-	 * @method private
-	 * @name _loadError
+	 * @name loadError
 	 * @description Error when resource fails to load
 	 * @param e [object] "Event data"
 	 */
-	function _loadError(e) {
+	function loadError(e) {
 		var $error = $('<div class="boxer-error"><p>Error Loading Resource</p></div>');
 
 		// Clean up
@@ -1078,18 +1011,18 @@
 
 		data.$image.off("load, error");
 
-		_appendObject($error);
+		appendObject($error);
 	}
 
 	/**
 	 * @method private
-	 * @name _onTouchStart
+	 * @name onTouchStart
 	 * @description Handle touch start event
 	 * @param e [object] "Event data"
 	 */
-	function _onTouchStart(e) {
-		_killEvent(e);
-		_clearTimer(data.touchTimer);
+	function onTouchStart(e) {
+		killEvent(e);
+		clearTimer(data.touchTimer);
 
 		if (!data.isAnimating) {
 			var touch = (typeof e.originalEvent.targetTouches !== "undefined") ? e.originalEvent.targetTouches[0] : null;
@@ -1107,25 +1040,25 @@
 				data.touchMin = 0;
 			}
 
-			data.$boxer.on("touchmove.boxer", _onTouchMove)
-					   .one("touchend.boxer", _onTouchEnd);
+			data.$boxer.on("touchmove.boxer", onTouchMove)
+					   .one("touchend.boxer", onTouchEnd);
 		}
 	}
 
 	/**
 	 * @method private
-	 * @name _onTouchMove
+	 * @name onTouchMove
 	 * @description Handles touchmove event
 	 * @param e [object] "Event data"
 	 */
-	function _onTouchMove(e) {
+	function onTouchMove(e) {
 		var touch = (typeof e.originalEvent.targetTouches !== "undefined") ? e.originalEvent.targetTouches[0] : null;
 
 		data.delta = data.xStart - ((touch) ? touch.pageX : e.clientX);
 
 		// Only prevent event if trying to swipe
 		if (data.delta > 20) {
-			_killEvent(e);
+			killEvent(e);
 		}
 
 		data.canSwipe = true;
@@ -1142,18 +1075,18 @@
 
 		data.$image.css({ transform: "translate3D("+newLeft+"px,0,0)" });
 
-		data.touchTimer = _startTimer(data.touchTimer, 300, function() { _onTouchEnd(e); });
+		data.touchTimer = startTimer(data.touchTimer, 300, function() { onTouchEnd(e); });
 	}
 
 	/**
 	 * @method private
-	 * @name _onTouchEnd
+	 * @name onTouchEnd
 	 * @description Handles touchend event
 	 * @param e [object] "Event data"
 	 */
-	function _onTouchEnd(e) {
-		_killEvent(e);
-		_clearTimer(data.touchTimer);
+	function onTouchEnd(e) {
+		killEvent(e);
+		clearTimer(data.touchTimer);
 
 		data.$boxer.off("touchmove.boxer touchend.boxer");
 
@@ -1175,7 +1108,7 @@
 			if (data.swipe) {
 				data.$controls.filter( (data.delta <= data.leftPosition) ? ".previous" : ".next" ).trigger("click");
 			}
-			_startTimer(data.resetTimer, data.duration, function() {
+			startTimer(data.resetTimer, data.duration, function() {
 				data.$boxer.removeClass("animated");
 			});
 		}
@@ -1183,12 +1116,12 @@
 
 	/**
 	 * @method private
-	 * @name _naturalSize
+	 * @name calculateNaturalSize
 	 * @description Determines natural size of target image
 	 * @param $img [jQuery object] "Source image object"
 	 * @return [object | boolean] "Object containing natural height and width values or false"
 	 */
-	function _naturalSize($img) {
+	function calculateNaturalSize($img) {
 		var node = $img[0],
 			img = new Image();
 
@@ -1212,11 +1145,11 @@
 
 	/**
 	 * @method private
-	 * @name _killEvent
+	 * @name killEvent
 	 * @description Prevents default and stops propagation on event
 	 * @param e [object] "Event data"
 	 */
-	function _killEvent(e) {
+	function killEvent(e) {
 		if (e.preventDefault) {
 			e.stopPropagation();
 			e.preventDefault();
@@ -1225,24 +1158,24 @@
 
 	/**
 	 * @method private
-	 * @name _startTimer
+	 * @name startTimer
 	 * @description Starts an internal timer
 	 * @param timer [int] "Timer ID"
 	 * @param time [int] "Time until execution"
 	 * @param callback [int] "Function to execute"
 	 */
-	function _startTimer(timer, time, callback) {
-		_clearTimer(timer);
+	function startTimer(timer, time, callback) {
+		clearTimer(timer);
 		return setTimeout(callback, time);
 	}
 
 	/**
 	 * @method private
-	 * @name _clearTimer
+	 * @name clearTimer
 	 * @description Clears an internal timer
 	 * @param timer [int] "Timer ID"
 	 */
-	function _clearTimer(timer) {
+	function clearTimer(timer) {
 		if (timer) {
 			clearTimeout(timer);
 			timer = null;
@@ -1251,11 +1184,11 @@
 
 	/**
 	 * @method private
-	 * @name _getTransitionEvent
+	 * @name getTransitionEvent
 	 * @description Retuns a properly prefixed transitionend event
 	 * @return [string] "Properly prefixed event"
 	 */
-	function _getTransitionEvent() {
+	function getTransitionEvent() {
 		var transitions = {
 				'WebkitTransition': 'webkitTransitionEnd',
 				'MozTransition':    'transitionend',
@@ -1279,7 +1212,7 @@
 		if (pub[method]) {
 			return pub[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		} else if (typeof method === 'object' || !method) {
-			return _init.apply(this, arguments);
+			return init.apply(this, arguments);
 		}
 		return this;
 	};
@@ -1289,7 +1222,7 @@
 			return pub[$target].apply(window, Array.prototype.slice.call(arguments, 1));
 		} else {
 			if ($target instanceof $) {
-				return _build.apply(window, [{ data: $.extend({
+				return build.apply(window, [{ data: $.extend({
 					$object: $target
 				}, options, opts || {}) }]);
 			}

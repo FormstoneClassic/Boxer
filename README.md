@@ -7,4 +7,4 @@ A jQuery plugin for displaying images, videos or content in a modal overlay. Par
 - [Documentation](http://formstone.it/boxer/) 
 
 #### Bower Support 
-`bower install Boxer`
+`bower install Boxer` 
