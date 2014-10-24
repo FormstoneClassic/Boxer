@@ -15,7 +15,7 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-		z-index: 100;
+		z-index: @boxer-z-index;
 
 		background: @boxer-overlay-background;
 		opacity: 0;
@@ -33,7 +33,7 @@
 		position: absolute;
 		right: 0;
 		left: 0;
-		z-index: 101;
+		z-index: (@boxer-z-index + 1);
 
 		background: @boxer-background;
 		border-radius: @boxer-border-radius;
@@ -41,6 +41,10 @@
 		opacity: 0;
 		margin: 0 auto;
 		padding: @boxer-padding;
+
+		* {
+			transition: none;
+		}
 
 		&,
 		& * {
@@ -80,8 +84,7 @@
 				top @boxer-transition-duration @boxer-transition-timing;
 
 			.boxer-container {
-				transition:
-					opacity @boxer-transition-duration linear @boxer-transition-duration;
+				transition: opacity @boxer-transition-duration linear @boxer-transition-duration;
 			}
 		}
 
@@ -93,12 +96,7 @@
 
 		&.loading .boxer-container {
 			opacity: 0;
-			transition:
-					opacity @boxer-transition-duration linear;
-		}
-
-		* {
-			transition: none;
+			transition: opacity @boxer-transition-duration linear;
 		}
 
 		// .boxer-close
@@ -110,7 +108,7 @@
 			position: absolute;
 			top: -@boxer-close-height / 4;
 			right: -@boxer-close-width / 4;
-			z-index: 105;
+			z-index: (@boxer-z-index + 5);
 
 			background: @boxer-close-background;
 			border-radius: @boxer-close-border-radius;
@@ -158,7 +156,7 @@
 			right: 0;
 			bottom: 0;
 			left: 0;
-			z-index: 105;
+			z-index: (@boxer-z-index + 5);
 
 			display: block;
 			margin: auto;
@@ -213,7 +211,7 @@
 			height: 100%;
 
 			position: relative;
-			z-index: 103;
+			z-index: (@boxer-z-index + 3);
 
 			background: @boxer-container-background;
 			overflow: hidden;
