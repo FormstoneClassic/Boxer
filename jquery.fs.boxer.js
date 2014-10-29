@@ -9,55 +9,52 @@
 ;(function ($, window) {
 	"use strict";
 
-	var namespace = "boxer",
-		$window = null,
-		$body = null,
-		trueMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test((window.navigator.userAgent||window.navigator.vendor||window.opera)),
-		transitionSupported = true,
-		data = {},
-		classes = {
-			overlay: "boxer-overlay",
-			base: "boxer",
-			close: "boxer-close",
-			loading: "boxer-loading-icon",
-			container: "boxer-container",
-			content: "boxer-content",
-			image: "boxer-image",
-			video: "boxer-video",
-			videoWrapper: "boxer-video-wrapper",
-			meta: "boxer-meta",
-			control: "boxer-control",
-			controlPrevious: "boxer-control-previous",
-			controlNext: "boxer-control-next",
-			controlDisabled: "boxer-control-disabled",
-			position: "boxer-position",
-			positionCurrent: "boxer-position-current",
-			positionTotal: "boxer-position-total",
-			caption: "boxer-caption",
-			captionGallery: "boxer-caption-gallery",
-			error: "boxer-error",
-			isLoading: "boxer-loading",
-			isAnimating: "boxer-animating",
-			isFixed: "boxer-fixed",
-			isMobile: "boxer-mobile",
-			isInline: "boxer-inline",
-			isIframe: "boxer-iframe",
-			isOpen: "boxer-open"
-		},
-		events = {
-			// trigger
-			close: "close." + namespace,
-			open: "open." + namespace,
-			// listen
-			click: "click." + namespace,
-			keydown: "keydown." + namespace,
-			resize: "resize." + namespace,
-			load: "load." + namespace,
-			touchStartClick: "touchstart." + namespace + " click." + namespace,
-			touchStart: "touchstart." + namespace,
-			touchMove: "touchmove." + namespace,
-			touchEnd: "touchend." + namespace
-		};
+	var namespace                = "boxer",
+		$window                  = null,
+		$body                    = null,
+		trueMobile               = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test((window.navigator.userAgent||window.navigator.vendor||window.opera)),
+		transitionSupported      = true,
+		data                     = null,
+		class_overlay            = namespace + "-overlay",
+		class_base               = namespace,
+		class_close              = namespace + "-close",
+		class_loading            = namespace + "-loading-icon",
+		class_container          = namespace + "-container",
+		class_content            = namespace + "-content",
+		class_image              = namespace + "-image",
+		class_video              = namespace + "-video",
+		class_videoWrapper       = namespace + "-video-wrapper",
+		class_meta               = namespace + "-meta",
+		class_control            = namespace + "-control",
+		class_controlPrevious    = namespace + "-control-previous",
+		class_controlNext        = namespace + "-control-next",
+		class_controlDisabled    = namespace + "-control-disabled",
+		class_position           = namespace + "-position",
+		class_positionCurrent    = namespace + "-position-current",
+		class_positionTotal      = namespace + "-position-total",
+		class_caption            = namespace + "-caption",
+		class_captionGallery     = namespace + "-caption-gallery",
+		class_error              = namespace + "-error",
+		class_isLoading          = namespace + "-loading",
+		class_isAnimating        = namespace + "-animating",
+		class_isFixed            = namespace + "-fixed",
+		class_isMobile           = namespace + "-mobile",
+		class_isInline           = namespace + "-inline",
+		class_isIframe           = namespace + "-iframe",
+		class_isOpen             = namespace + "-open",
+		// trigger
+		event_close              = "close."  + namespace,
+		event_open               = "open."   + namespace,
+		// listen
+		event_click              = "click."      + namespace,
+		event_keydown            = "keydown."    + namespace,
+		event_resize             = "resize."     + namespace,
+		event_load               = "load."       + namespace,
+		event_touchStart         = "touchstart." + namespace,
+		event_touchMove          = "touchmove."  + namespace,
+		event_touchEnd           = "touchend."   + namespace,
+		event_touchStartClick    = event_click + " " + event_touchStart,
+		event_transition;
 
 	/**
 	 * @options
@@ -82,27 +79,27 @@
 	 * @param videoWidth [int] <600> "Video target width"
 	 */
 	var options = {
-		callback: $.noop,
-		customClass: "",
-		extensions: [ "jpg", "sjpg", "jpeg", "png", "gif" ],
-		fixed: false,
-		formatter: $.noop,
+		callback:        $.noop,
+		customClass:     "",
+		extensions:      [ "jpg", "sjpg", "jpeg", "png", "gif" ],
+		fixed:           false,
+		formatter:       $.noop,
 		labels: {
-			close: "Close",
-			count: "of",
-			next: "Next",
-			previous: "Previous"
+			close:       "Close",
+			count:       "of",
+			next:        "Next",
+			previous:    "Previous"
 		},
-		margin: 50,
-		minHeight: 100,
-		minWidth: 100,
-		mobile: false,
-		opacity: 0.75,
-		retina: false,
-		requestKey: "boxer",
-		top: 0,
-		videoRatio: 0.5625,
-		videoWidth: 600
+		margin:          50,
+		minHeight:       100,
+		minWidth:        100,
+		mobile:          false,
+		opacity:         0.75,
+		retina:          false,
+		requestKey:      "boxer",
+		top:             0,
+		videoRatio:      0.5625,
+		videoWidth:      600
 	};
 
 	/**
@@ -120,9 +117,9 @@
 		 * @example $.boxer("close");
 		 */
 		close: function() {
-			if (typeof data.$boxer !== "undefined") {
+			if (data) {
 				data.$boxer.off( classify(namespace) );
-				data.$overlay.triggerHandler(events.click);
+				data.$overlay.trigger(event_click);
 			}
 		},
 
@@ -157,7 +154,7 @@
 		 * @param width [int | false] "Target width or false to auto size"
 		 */
 		resize: function(e) {
-			if (typeof data.$boxer !== "undefined") {
+			if (data) {
 				if (typeof e !== "object") {
 					data.targetHeight = arguments[0];
 					data.targetWidth  = arguments[1];
@@ -170,6 +167,7 @@
 				} else if (data.type === "video") {
 					sizeVideo();
 				}
+
 				size();
 			}
 
@@ -189,9 +187,9 @@
 		$window = $(window);
 		$body = $("body");
 
-		events.transition = getTransitionEvent();
+		event_transition = getTransitionEvent();
 
-		return $(this).on(events.click, $.extend({}, options, opts || {}), build);
+		return $(this).on(event_click, $.extend({}, options, opts || {}), build);
 	}
 
 	/**
@@ -201,20 +199,20 @@
 	 * @param e [object] "Event data"
 	 */
 	function build(e) {
-		if (typeof data.$boxer === "undefined") {
+		if (!data) {
 			// Check target type
-			var $target = $(this),
-				$object = e.data.$object,
-				source = ($target[0].href) ? $target[0].href || "" : "",
-				hash = ($target[0].hash) ? $target[0].hash || "" : "",
-				sourceParts = source.toLowerCase().split(".").pop().split(/\#|\?/),
-				extension = sourceParts[0],
-				type = $target.data("boxer-type") || "",
-				isImage	= ( (type === "image") || ($.inArray(extension, e.data.extensions) > -1 || source.substr(0, 10) === "data:image") ),
-				isVideo	= ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 ),
-				isUrl	  = ( (type === "url") || (!isImage && !isVideo && source.substr(0, 4) === "http" && !hash) ),
-				isElement  = ( (type === "element") || (!isImage && !isVideo && !isUrl && (hash.substr(0, 1) === "#")) ),
-				isObject   = ( (typeof $object !== "undefined") );
+			var $target        = $(this),
+				$object        = e.data.$object,
+				source         = ($target[0].href) ? $target[0].href || "" : "",
+				hash           = ($target[0].hash) ? $target[0].hash || "" : "",
+				sourceParts    = source.toLowerCase().split(".").pop().split(/\#|\?/),
+				extension      = sourceParts[0],
+				type           = $target.data("boxer-type") || "",
+				isImage	       = ( (type === "image") || ($.inArray(extension, e.data.extensions) > -1 || source.substr(0, 10) === "data:image") ),
+				isVideo	       = ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 ),
+				isUrl	       = ( (type === "url") || (!isImage && !isVideo && source.substr(0, 4) === "http" && !hash) ),
+				isElement      = ( (type === "element") || (!isImage && !isVideo && !isUrl && (hash.substr(0, 1) === "#")) ),
+				isObject       = ( (typeof $object !== "undefined") );
 
 			if (isElement) {
 				source = hash;
@@ -230,18 +228,18 @@
 
 			// Cache internal data
 			data = $.extend({}, {
-				$target: $target,
-				$object: $object,
-				visible: false,
-				resizeTimer: null,
-				touchTimer: null,
+				$target            : $target,
+				$object            : $object,
+				visible            : false,
+				resizeTimer        : null,
+				touchTimer         : null,
 				gallery: {
-					active: false
+					active         : false
 				},
-				isMobile: (trueMobile || e.data.mobile),
-				isAnimating: true,
-				oldContentHeight: 0,
-				oldContentWidth: 0
+				isMobile           : (trueMobile || e.data.mobile),
+				isAnimating        : true,
+				oldContentHeight   : 0,
+				oldContentWidth    : 0
 			}, e.data);
 
 			// Double the margin
@@ -259,7 +257,7 @@
 				// Check for gallery
 				var id = data.$target.data("gallery") || data.$target.attr("rel"); // backwards compatibility
 
-				if (typeof id !== "undefined" && id !== false) {
+				if (id) {
 					data.gallery.active = true;
 					data.gallery.id = id;
 					data.gallery.$items = $("a[data-gallery= " + data.gallery.id + "], a[rel= " + data.gallery.id + "]"); // backwards compatibility
@@ -271,42 +269,44 @@
 			// Assemble HTML
 			var html = '';
 			if (!data.isMobile) {
-				html += '<div class="' + [classes.overlay, data.customClass].join(" ") + '"></div>';
+				html += '<div class="' + [class_overlay, data.customClass].join(" ") + '"></div>';
 			}
-			html += '<div class="' + [classes.base, classes.isLoading, classes.isAnimating, data.customClass].join(" ");
+			html += '<div class="' + [class_base, class_isLoading, class_isAnimating, data.customClass].join(" ");
 			if (data.fixed) {
-				html += classes.isFixed;
+				html += class_isFixed;
 			}
 			if (data.isMobile) {
-				html += classes.isMobile;
+				html += class_isMobile;
 			}
 			if (isUrl) {
-				html += classes.isIframe;
+				html += class_isIframe;
 			}
 			if (isElement || isObject) {
-				html += classes.isInline;
+				html += class_isInline;
 			}
 			html += '">';
-			html += '<span class="' + classes.close + '">' + data.labels.close + '</span>';
-			html += '<span class="' + classes.loading + '"></span>';
-			html += '<div class="' + classes.container + '">';
-			html += '<div class="' + classes.content + '">';
+			html += '<span class="' + class_close + '">' + data.labels.close + '</span>';
+			html += '<span class="' + class_loading + '"></span>';
+			html += '<div class="' + class_container + '">';
+			html += '<div class="' + class_content + '">';
 			if (isImage || isVideo) {
-				html += '<div class="' + classes.meta + '">';
+				html += '<div class="' + class_meta + '">';
 
 				if (data.gallery.active) {
-					html += '<div class="' + [classes.control, classes.controlPrevious].join(" ") + '">' + data.labels.previous + '</div>';
-					html += '<div class="' + [classes.control, classes.controlNext].join(" ") + '">' + data.labels.next + '</div>';
-					html += '<p class="' + classes.position + '"';
+					html += '<div class="' + [class_control, class_controlPrevious].join(" ") + '">' + data.labels.previous + '</div>';
+					html += '<div class="' + [class_control, class_controlNext].join(" ") + '">' + data.labels.next + '</div>';
+					html += '<p class="' + class_position + '"';
 					if (data.gallery.total < 1) {
 						html += ' style="display: none;"';
 					}
 					html += '>';
-					html += '<span class="current">' + (data.gallery.index + 1) + '</span> ' + data.labels.count + ' <span class="total">' + (data.gallery.total + 1) + '</span>';
+					html += '<span class="' + class_positionCurrent + '">' + (data.gallery.index + 1) + '</span> ';
+					html += data.labels.count;
+					html += ' <span class="' + class_positionTotal + '">' + (data.gallery.total + 1) + '</span>';
 					html += '</p>';
-					html += '<div class="' + [classes.caption, classes.captionGallery].join(" ") + '">';
+					html += '<div class="' + [class_caption, class_captionGallery].join(" ") + '">';
 				} else {
-					html += '<div class="' + classes.caption + '">';
+					html += '<div class="' + class_caption + '">';
 				}
 
 				html += data.formatter.apply($window, [data.$target]);
@@ -318,15 +318,15 @@
 			$body.append(html);
 
 			// Cache jquery objects
-			data.$overlay = $( classify(classes.overlay) );
-			data.$boxer = $( classify(classes.base) );
-			data.$close = data.$boxer.find( classify(classes.close) );
-			data.$container = data.$boxer.find( classify(classes.container) );
-			data.$content = data.$boxer.find( classify(classes.content) );
-			data.$meta = data.$boxer.find( classify(classes.meta) );
-			data.$position = data.$boxer.find( classify(classes.position) );
-			data.$caption = data.$boxer.find( classify(classes.caption) );
-			data.$controls = data.$boxer.find( classify(classes.control) );
+			data.$overlay = $( classify(class_overlay) );
+			data.$boxer = $( classify(class_base) );
+			data.$close = data.$boxer.find( classify(class_close) );
+			data.$container = data.$boxer.find( classify(class_container) );
+			data.$content = data.$boxer.find( classify(class_content) );
+			data.$meta = data.$boxer.find( classify(class_meta) );
+			data.$position = data.$boxer.find( classify(class_position) );
+			data.$caption = data.$boxer.find( classify(class_caption) );
+			data.$controls = data.$boxer.find( classify(class_control) );
 
 			data.paddingVertical = (!data.isMobile) ? (parseInt(data.$boxer.css("paddingTop"), 10) + parseInt(data.$boxer.css("paddingBottom"), 10)) : (data.$close.outerHeight() / 2);
 			data.paddingHorizontal = (!data.isMobile) ? (parseInt(data.$boxer.css("paddingLeft"), 10) + parseInt(data.$boxer.css("paddingRight"), 10)) : 0;
@@ -343,21 +343,21 @@
 			}
 
 			// Bind events
-			$window.on(events.resize, pub.resize)
-				   .on(events.keydown, onKeydown);
+			$window.on(event_resize, pub.resize)
+				   .on(event_keydown, onKeydown);
 
-			$body.on(events.touchStartClick, [classify(classes.overlay), classify(classes.close)].join(", "), onClose)
-				 .on(events.move, killEvent);
+			$body.on(event_touchStartClick, [classify(class_overlay), classify(class_close)].join(", "), onClose)
+				 .on(event_touchMove, killEvent);
 
 			if (data.gallery.active) {
-				data.$boxer.on(events.touchStartClick, classify(classes.control), advanceGallery);
+				data.$boxer.on(event_touchStartClick, classify(class_control), advanceGallery);
 			}
 
-			data.$boxer.on(events.transition, function(e) {
+			data.$boxer.on(event_transition, function(e) {
 				killEvent(e);
 
 				if ($(e.target).is(data.$boxer)) {
-					data.$boxer.off(events.transition);
+					data.$boxer.off(event_transition);
 
 					if (isImage) {
 						loadImage(source);
@@ -375,10 +375,10 @@
 				}
 			});
 
-			$body.addClass(classes.isOpen);
+			$body.addClass(class_isOpen);
 
 			if (!transitionSupported) {
-				data.$boxer.triggerHandler(events.transition);
+				data.$boxer.trigger(event_transition);
 			}
 
 			if (isObject) {
@@ -396,46 +396,34 @@
 	function onClose(e) {
 		killEvent(e);
 
-		if (typeof data.$boxer !== "undefined") {
-			data.$boxer.on(events.transition, function(e) {
+		if (data) {
+			data.$boxer.on(event_transition, function(e) {
 				killEvent(e);
 
 				if ($(e.target).is(data.$boxer)) {
-					data.$boxer.off(events.transition);
+					// Clean up
+					data.$boxer.off( classify(namespace) );
+					data.$container.off( classify(namespace) );
+					$window.off( classify(namespace) );
+					$body.off( classify(namespace) );
 
 					data.$overlay.remove();
 					data.$boxer.remove();
 
 					// reset data
-					data = {};
-				}
-			}).addClass(classes.isAnimating);
+					data = null;
 
-			$body.removeClass(classes.isOpen);
+					$window.trigger(event_close);
+				}
+			}).addClass(class_isAnimating);
+
+			$body.removeClass(class_isOpen);
 
 			if (!transitionSupported) {
-				data.$boxer.triggerHandler(events.transition);
+				data.$boxer.trigger(event_transition);
 			}
 
 			clearTimer(data.resizeTimer);
-
-			// Clean up
-			$window.off( classify(namespace) );
-
-			$body.off( classify(namespace) )
-				 .removeClass(classes.isOpen);
-
-			if (data.gallery.active) {
-				data.$boxer.off( classify(namespace) );
-			}
-
-			if (data.isMobile) {
-				if (data.type === "image" && data.gallery.active) {
-					data.$container.off( classify(namespace) );
-				}
-			}
-
-			$window.trigger(events.close);
 		}
 	}
 
@@ -455,42 +443,42 @@
 		}
 
 		if (!data.visible && data.isMobile && data.gallery.active) {
-			data.$content.on(events.start, classify(classes.image), onTouchStart);
+			data.$content.on(event_touchStart, classify(class_image), onTouchStart);
 		}
 
 		if (data.isMobile || data.fixed) {
-			$body.addClass(classes.isOpen);
+			$body.addClass(class_isOpen);
 		}
 
-		data.$boxer.on(events.transition, function(e) {
+		data.$boxer.on(event_transition, function(e) {
 			killEvent(e);
 
 			if ($(e.target).is(data.$boxer)) {
-				data.$boxer.off(events.transition);
+				data.$boxer.off(event_transition);
 
-				data.$container.on(events.transition, function(e) {
+				data.$container.on(event_transition, function(e) {
 					killEvent(e);
 
 					if ($(e.target).is(data.$container)) {
-						data.$container.off(events.transition);
+						data.$container.off(event_transition);
 
-						data.$boxer.removeClass(classes.isAnimating);
+						data.$boxer.removeClass(class_isAnimating);
 
 						data.isAnimating = false;
 					}
 				});
 
-				data.$boxer.removeClass(classes.isLoading);
+				data.$boxer.removeClass(class_isLoading);
 
 				if (!transitionSupported) {
-					data.$content.triggerHandler(events.transition);
+					data.$content.trigger(event_transition);
 				}
 
 				data.visible = true;
 
 				// Fire callback + event
 				data.callback.apply(data.$boxer);
-				$window.trigger(events.open);
+				$window.trigger(event_open);
 
 				// Start preloading
 				if (data.gallery.active) {
@@ -511,7 +499,7 @@
 		var contentHasChanged = (data.oldContentHeight !== data.contentHeight || data.oldContentWidth !== data.contentWidth);
 
 		if (data.isMobile || !transitionSupported || !contentHasChanged) {
-			data.$boxer.triggerHandler(events.transition);
+			data.$boxer.trigger(event_transition);
 		}
 
 		// Track content size changes
@@ -600,7 +588,7 @@
 		// Cache current image
 		data.$image = $("<img>");
 
-		data.$image.on(events.load, function() {
+		data.$image.on(event_load, function() {
 			data.$image.off( classify(namespace) );
 
 			var naturalSize = calculateNaturalSize(data.$image);
@@ -626,11 +614,11 @@
 			open();
 		}).error(loadError)
 		  .attr("src", source)
-		  .addClass(classes.image);
+		  .addClass(class_image);
 
 		// If image has already loaded into cache, trigger load event
 		if (data.$image[0].complete || data.$image[0].readyState === 4) {
-			data.$image.triggerHandler(events.load);
+			data.$image.trigger(event_load);
 		}
 	}
 
@@ -777,11 +765,11 @@
 	 * @param source [string] "Source video URL"
 	 */
 	function loadVideo(source) {
-		data.$videoWrapper = $('<div class="' + classes.videoWrapper + '"></div>');
-		data.$video = $('<iframe class="' + classes.video + '" seamless="seamless"></iframe>');
+		data.$videoWrapper = $('<div class="' + class_videoWrapper + '"></div>');
+		data.$video = $('<iframe class="' + class_video + '" seamless="seamless"></iframe>');
 
 		data.$video.attr("src", source)
-				   .addClass(classes.video)
+				   .addClass(class_video)
 				   .prependTo(data.$videoWrapper);
 
 		data.$content.prepend(data.$videoWrapper);
@@ -884,11 +872,12 @@
 	function advanceGallery(e) {
 		killEvent(e);
 
-		var $control = $(this);
-		if (!data.isAnimating && !$control.hasClass("disabled")) {
+		var $control = $(e.currentTarget);
+
+		if (!data.isAnimating && !$control.hasClass(class_controlDisabled)) {
 			data.isAnimating = true;
 
-			data.gallery.index += ($control.hasClass("next")) ? 1 : -1;
+			data.gallery.index += ($control.hasClass(class_controlNext)) ? 1 : -1;
 			if (data.gallery.index > data.gallery.total) {
 				data.gallery.index = data.gallery.total;
 			}
@@ -896,11 +885,11 @@
 				data.gallery.index = 0;
 			}
 
-			data.$container.on(events.transition, function(e) {
+			data.$container.on(event_transition, function(e) {
 				killEvent(e);
 
 				if ($(e.target).is(data.$container)) {
-					data.$container.off(events.transition);
+					data.$container.off(event_transition);
 
 					if (typeof data.$image !== 'undefined') {
 						data.$image.remove();
@@ -911,7 +900,7 @@
 					data.$target = data.gallery.$items.eq(data.gallery.index);
 
 					data.$caption.html(data.formatter.apply($body, [data.$target]));
-					data.$position.find(classes.positionCurrent).html(data.gallery.index + 1);
+					data.$position.find( classify(class_positionCurrent) ).html(data.gallery.index + 1);
 
 					var source = data.$target.attr("href"),
 						isVideo = ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 );
@@ -925,10 +914,10 @@
 				}
 			});
 
-			data.$boxer.addClass( [classes.isLoading, classes.isAnimating].join(" "));
+			data.$boxer.addClass( [class_isLoading, class_isAnimating].join(" "));
 
 			if (!transitionSupported) {
-				data.$content.triggerHandler(events.transition);
+				data.$content.trigger(event_transition);
 			}
 		}
 	}
@@ -939,12 +928,12 @@
 	 * @description Updates gallery control states
 	 */
 	function updateControls() {
-		data.$controls.removeClass(classes.controlDisabled);
+		data.$controls.removeClass(class_controlDisabled);
 		if (data.gallery.index === 0) {
-			data.$controls.filter(classes.controlPrevious).addClass(classes.controlDisabled);
+			data.$controls.filter( classify(class_controlPrevious) ).addClass(class_controlDisabled);
 		}
 		if (data.gallery.index === data.gallery.total) {
-			data.$controls.filter(classes.controlNext).addClass(classes.controlDisabled);
+			data.$controls.filter( classify(class_controlNext) ).addClass(class_controlDisabled);
 		}
 	}
 
@@ -958,9 +947,9 @@
 		if (data.gallery.active && (e.keyCode === 37 || e.keyCode === 39)) {
 			killEvent(e);
 
-			data.$controls.filter((e.keyCode === 37) ? classes.controlPrevious : classes.controlNext).triggerHandler(events.click);
+			data.$controls.filter(classify((e.keyCode === 37) ? class_controlPrevious : class_controlNext)).trigger(event_click);
 		} else if (e.keyCode === 27) {
-			data.$close.triggerHandler(events.click);
+			data.$close.trigger(event_click);
 		}
 	}
 
@@ -983,7 +972,7 @@
 	 */
 	function loadURL(source) {
 		source = source + ((source.indexOf("?") > -1) ? "&" + options.requestKey + "=true" : "?" + options.requestKey + "=true");
-		var $iframe = $('<iframe class="' + classes.isIframe + '" src="' + source + '"></iframe>');
+		var $iframe = $('<iframe class="' + class_isIframe + '" src="' + source + '"></iframe>');
 		appendObject($iframe);
 	}
 
@@ -1041,7 +1030,7 @@
 	 * @param e [object] "Event data"
 	 */
 	function loadError(e) {
-		var $error = $('<div class="' + classes.error + '"><p>Error Loading Resource</p></div>');
+		var $error = $('<div class="' + class_error + '"><p>Error Loading Resource</p></div>');
 
 		// Clean up
 		data.type = "element";
@@ -1078,8 +1067,8 @@
 				data.touchMin = 0;
 			}
 
-			data.$boxer.on(events.touchMove, onTouchMove)
-					   .one(events.touchEnd, onTouchEnd);
+			data.$boxer.on(event_touchMove, onTouchMove)
+					   .one(event_touchEnd, onTouchEnd);
 		}
 	}
 
@@ -1126,10 +1115,10 @@
 		killEvent(e);
 		clearTimer(data.touchTimer);
 
-		data.$boxer.off( [events.touchMove, events.touchEnd].join("") );
+		data.$boxer.off( [event_touchMove, event_touchEnd].join("") );
 
 		if (data.delta) {
-			data.$boxer.addClass(classes.isAnimating);
+			data.$boxer.addClass(class_isAnimating);
 			data.swipe = false;
 
 			if (data.canSwipe && (data.delta > data.edge || data.delta < -data.edge)) {
@@ -1144,10 +1133,10 @@
 			}
 
 			if (data.swipe) {
-				data.$controls.filter( (data.delta <= data.leftPosition) ? ".previous" : ".next" ).triggerHandler(events.click);
+				data.$controls.filter(classify((data.delta <= data.leftPosition) ? class_controlPrevious : class_controlNext)).trigger(event_click);
 			}
 			startTimer(data.resetTimer, data.duration, function() {
-				data.$boxer.removeClass(classes.isAnimating);
+				data.$boxer.removeClass(class_isAnimating);
 			});
 		}
 	}

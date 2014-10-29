@@ -29,50 +29,50 @@
 		<!--[DEMO:START-RESOURCES]-->
 
 		<style>
-			.boxer { border: none; }
+			.lightbox { border: none; }
 			.inline_content { width: 300px; overflow: hidden; padding: 0 20px; }
-			#boxer h3 { font-style: italic; font-size: 16px; margin: 0; padding: 15px 10px 10px; }
+			.boxer h3 { font-style: italic; font-size: 16px; margin: 0; padding: 15px 10px 10px; }
 
-			#boxer.mobile.inline .boxer-content { background: #fff; }
-			#boxer.mobile.inline .inline_content { height: 10000px; overflow: scroll; padding: 30px 50px; width: 100%; }
+			.boxer.boxer-mobile.boxer-inline .boxer-content { background: #fff; }
+			.boxer.boxer-mobile.boxer-inline .inline_content { height: 10000px; overflow: scroll; padding: 30px 50px; width: 100%; }
 		</style>
 
 		<script>
 			$(document).ready(function() {
-				$(".boxer").not(".retina, .boxer_fixed, .boxer_top, .boxer_format, .boxer_mobile, .boxer_object").boxer();
+				$(".lightbox").not(".retina, .boxer_fixed, .boxer_top, .boxer_format, .boxer_mobile, .boxer_object").boxer();
 
-				$(".boxer.boxer_fixed").boxer({
+				$(".lightbox.boxer_fixed").boxer({
 					fixed: true
 				});
 
-				$(".boxer.boxer_top").boxer({
+				$(".lightbox.boxer_top").boxer({
 					top: 50
 				});
 
-				$(".boxer.retina").boxer({
+				$(".lightbox.retina").boxer({
 					retina: true
 				});
 
-				$(".boxer.boxer_format").boxer({
+				$(".lightbox.boxer_format").boxer({
 					formatter: function($target) {
 						return '<h3>' + $target.attr("title") + "</h3>";
 					}
 				});
 
-				$(".boxer.boxer_object").click(function(e) {
+				$(".lightbox.boxer_object").click(function(e) {
 					e.preventDefault();
 					e.stopPropagation();
 
 					$.boxer( $('<div class="inline_content"><h2>More Content!</h2><p>This was created by jQuery and loaded into the new Boxer instance.</p></div>') );
 				});
 
-				$(".boxer.boxer_mobile").boxer({
+				$(".lightbox.boxer_mobile").boxer({
 					mobile: true
 				});
 
 				$(window).one("pronto.load", function() {
 					$.boxer("close");
-					$(".boxer").boxer("destroy");
+					$(".lightbox").boxer("destroy");
 				});
 			});
 		</script>
@@ -102,14 +102,14 @@
 				<h2>Basic</h2>
 				<p>To display a single image simply link to the source. Also, 'title' attributes will automatically populate the caption field:</p>
 
-				<pre class="example"><code class="language-javascript">$(".boxer").boxer();</code></pre>
-				<pre class="example"><code class="language-markup">&lt;a href="image.jpg" class="boxer" title="Caption"&gt;
+				<pre class="example"><code class="language-javascript">$(".lightbox").boxer();</code></pre>
+				<pre class="example"><code class="language-markup">&lt;a href="image.jpg" class="lightbox" title="Caption"&gt;
 	&lt;img src="thumbnail.jpg" alt="Thumbnail" /&gt;
 &lt;/a&gt;</code></pre>
 
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="lightbox boxer_image" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
 						<img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
@@ -120,22 +120,22 @@
 				<h2>Gallery</h2>
 				<p>To display a gallery of images attach a common 'data-gallery' attribute to each item:</p>
 
-				<pre class="example"><code class="language-markup">&lt;a href="image_1.jpg" class="boxer" title="Caption One" data-gallery="gallery"&gt;
+				<pre class="example"><code class="language-markup">&lt;a href="image_1.jpg" class="lightbox" title="Caption One" data-gallery="gallery"&gt;
     &lt;img src="thumbnail_1.jpg" alt="Thumbnail One" /&gt;
 &lt;/a&gt;
-&lt;a href="image_2.jpg" class="boxer" title="Caption Two" data-gallery="gallery"&gt;
+&lt;a href="image_2.jpg" class="lightbox" title="Caption Two" data-gallery="gallery"&gt;
     &lt;img src="thumbnail_2.jpg" alt="Thumbnail Two" /&gt;
 &lt;/a&gt;</code></pre>
 
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image" data-gallery="gallery" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="lightbox boxer_image" data-gallery="gallery" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
 					    <img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;">
 					</a>
-					<a href="http://formstone.it/files/demo/nasa-bw-2.jpg" class="boxer boxer_image" data-gallery="gallery" title="By NASA on The Commons (Bumper V-2 Launch) [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-2.jpg" class="lightbox boxer_image" data-gallery="gallery" title="By NASA on The Commons (Bumper V-2 Launch) [Public domain], via Wikimedia Commons">
 					    <img src="http://formstone.it/files/demo/nasa-bw-2.jpg" alt="" style="height: 100px;">
 					</a>
-					<a href="http://formstone.it/files/demo/nasa-bw-3.jpg" class="boxer boxer_image" data-gallery="gallery" title="By NASA on The Commons [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-3.jpg" class="lightbox boxer_image" data-gallery="gallery" title="By NASA on The Commons [Public domain], via Wikimedia Commons">
 					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
@@ -152,10 +152,10 @@
 
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="//www.youtube.com/embed/zsJpUCWfyPE?rel=0" class="boxer button small" data-gallery="video_gallery" title="STS-129 HD Launch">
+					<a href="//www.youtube.com/embed/zsJpUCWfyPE?rel=0" class="lightbox button small" data-gallery="video_gallery" title="STS-129 HD Launch">
 						YouTube Video
 					</a>
-				    <a href="//player.vimeo.com/video/15091562" class="boxer button small" data-gallery="video_gallery" title="Homemade Spacecraft">
+				    <a href="//player.vimeo.com/video/15091562" class="lightbox button small" data-gallery="video_gallery" title="Homemade Spacecraft">
 						Vimeo Video
 					</a>
 				</div>
@@ -166,19 +166,19 @@
 				<h2>Mobile</h2>
 				<p>Boxer will automatically render a touch-friendly modal on mobile devices, but you can also force it to always render as mobile:</p>
 
-				<pre class="example"><code class="language-javascript">$(".boxer").boxer({
+				<pre class="example"><code class="language-javascript">$(".lightbox").boxer({
     mobile: true
 });</code></pre>
 
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image boxer_mobile" data-gallery="gallery_mobile" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="lightbox boxer_image boxer_mobile" data-gallery="gallery_mobile" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
 						<img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;">
 					</a>
-					<a href="http://formstone.it/files/demo/nasa-bw-2.jpg" class="boxer boxer_image boxer_mobile" data-gallery="gallery_mobile" title="By NASA on The Commons (Bumper V-2 Launch) [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-2.jpg" class="lightbox boxer_image boxer_mobile" data-gallery="gallery_mobile" title="By NASA on The Commons (Bumper V-2 Launch) [Public domain], via Wikimedia Commons">
 					    <img src="http://formstone.it/files/demo/nasa-bw-2.jpg" alt="" style="height: 100px;">
 					</a>
-					<a href="http://formstone.it/files/demo/nasa-bw-3.jpg" class="boxer boxer_image boxer_mobile" data-gallery="gallery_mobile" title="By NASA on The Commons [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-3.jpg" class="lightbox boxer_image boxer_mobile" data-gallery="gallery_mobile" title="By NASA on The Commons [Public domain], via Wikimedia Commons">
 					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
@@ -189,19 +189,19 @@
 				<h2>Fixed Positioning</h2>
 				<p>To display a more traditional lightbox that locks the window while open:</p>
 
-				<pre class="example"><code class="language-javascript">$(".boxer").boxer({
+				<pre class="example"><code class="language-javascript">$(".lightbox").boxer({
     fixed: true
 });</code></pre>
 
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image boxer_fixed" data-gallery="gallery_fixed" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="lightbox boxer_image boxer_fixed" data-gallery="gallery_fixed" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
 					    <img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;">
 					</a>
-					<a href="http://formstone.it/files/demo/nasa-bw-2.jpg" class="boxer boxer_image boxer_fixed" data-gallery="gallery_fixed" title="By NASA on The Commons (Bumper V-2 Launch) [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-2.jpg" class="lightbox boxer_image boxer_fixed" data-gallery="gallery_fixed" title="By NASA on The Commons (Bumper V-2 Launch) [Public domain], via Wikimedia Commons">
 					    <img src="http://formstone.it/files/demo/nasa-bw-2.jpg" alt="" style="height: 100px;">
 					</a>
-					<a href="http://formstone.it/files/demo/nasa-bw-3.jpg" class="boxer boxer_image boxer_fixed" data-gallery="gallery_fixed" title="By NASA on The Commons [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-3.jpg" class="lightbox boxer_image boxer_fixed" data-gallery="gallery_fixed" title="By NASA on The Commons [Public domain], via Wikimedia Commons">
 					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
@@ -212,19 +212,19 @@
 				<h2>Top Positioning</h2>
 				<p>To force the modal to always animate from a standard top position:</p>
 
-				<pre class="example"><code class="language-javascript">$(".boxer").boxer({
+				<pre class="example"><code class="language-javascript">$(".lightbox").boxer({
     top: 50
 });</code></pre>
 
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image boxer_top" data-gallery="gallery_top" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="lightbox boxer_image boxer_top" data-gallery="gallery_top" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
 						<img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;">
 					</a>
-					<a href="http://formstone.it/files/demo/nasa-bw-2.jpg" class="boxer boxer_image boxer_top" data-gallery="gallery_top" title="By NASA on The Commons (Bumper V-2 Launch) [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-2.jpg" class="lightbox boxer_image boxer_top" data-gallery="gallery_top" title="By NASA on The Commons (Bumper V-2 Launch) [Public domain], via Wikimedia Commons">
 					    <img src="http://formstone.it/files/demo/nasa-bw-2.jpg" alt="" style="height: 100px;">
 					</a>
-					<a href="http://formstone.it/files/demo/nasa-bw-3.jpg" class="boxer boxer_image boxer_top" data-gallery="gallery_top" title="By NASA on The Commons [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-3.jpg" class="lightbox boxer_image boxer_top" data-gallery="gallery_top" title="By NASA on The Commons [Public domain], via Wikimedia Commons">
 					    <img src="http://formstone.it/files/demo/nasa-bw-3.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
@@ -235,7 +235,7 @@
 				<h2>In-Line Content</h2>
 				<p>To display a section of inline markup link to the parent element's 'id'. It's important to note that a copy of the matching element's inner markup will be used, so try to avoid using decent elements with id selectors:</p>
 
-				<pre class="example"><code class="language-markup">&lt;a href="#hidden" class="boxer"&gt;Show Content&lt;/a&gt;
+				<pre class="example"><code class="language-markup">&lt;a href="#hidden" class="lightbox"&gt;Show Content&lt;/a&gt;
 &lt;div id="hidden" style="display: none;"&gt;
     &lt;div class="content"&gt;
         ...
@@ -244,7 +244,7 @@
 
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="#hidden_content" class="boxer button small">Show Hidden Content</a>
+					<a href="#hidden_content" class="lightbox button small">Show Hidden Content</a>
 				</div>
 				<div id="hidden_content" style="display: none;">
 					<div class="inline_content">
@@ -271,7 +271,7 @@ $.boxer($obj);</code></pre>
 
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="#" class="boxer boxer_object button small">Show jQuery Object</a>
+					<a href="#" class="lightbox boxer_object button small">Show jQuery Object</a>
 				</div>
 
 				<br>
@@ -280,11 +280,11 @@ $.boxer($obj);</code></pre>
 				<h2>iFrame</h2>
 				<p>To display a valid URL in an iFrame simply link to the page:</p>
 
-				<pre class="example"><code class="language-markup">&lt;a href="http://www.example.com/" class="boxer"&gt;Example&lt;/a&gt;</code></pre>
+				<pre class="example"><code class="language-markup">&lt;a href="http://www.example.com/" class="lightbox"&gt;Example&lt;/a&gt;</code></pre>
 
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="http://www.cnn.com/" class="boxer button small">View CNN.com</a>
+					<a href="http://www.cnn.com/" class="lightbox button small">View CNN.com</a>
 				</div>
 
 				<br>
@@ -294,11 +294,11 @@ $.boxer($obj);</code></pre>
 				<h2>Local iFrame</h2>
 				<p>You can also link to local iFrames:</p>
 
-				<pre class="example"><code class="language-markup">&lt;a href="iframe.html" class="boxer"&gt;Example&lt;/a&gt;</code></pre>
+				<pre class="example"><code class="language-markup">&lt;a href="iframe.html" class="lightbox"&gt;Example&lt;/a&gt;</code></pre>
 
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="iframe.html" class="boxer button small">View iFrame</a>
+					<a href="iframe.html" class="lightbox button small">View iFrame</a>
 				</div>
 
 				<br>
@@ -308,11 +308,11 @@ $.boxer($obj);</code></pre>
 				<h2>Sizing</h2>
 				<p>When loading inline content or an iFramed URL you can specify the desired dimensions using html data attributes. If no dimensions are specified, or mobile styles are being rendered, the plugin will calculate them based on the current window and content size:</p>
 
-				<pre class="example"><code class="language-markup">&lt;a href="http://www.example.com/" class="boxer" data-boxer-height="500" data-boxer-width="500"&gt;Example&lt;/a&gt;</code></pre>
+				<pre class="example"><code class="language-markup">&lt;a href="http://www.example.com/" class="lightbox" data-boxer-height="500" data-boxer-width="500"&gt;Example&lt;/a&gt;</code></pre>
 
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="http://www.cnn.com/" class="boxer button small" data-boxer-height="500" data-boxer-width="500">View CNN.com</a>
+					<a href="http://www.cnn.com/" class="lightbox button small" data-boxer-height="500" data-boxer-width="500">View CNN.com</a>
 				</div>
 
 				<br>
@@ -321,7 +321,7 @@ $.boxer($obj);</code></pre>
 				<h2>Caption Formating</h2>
 				<p>To customize the caption markup:</p>
 
-				<pre class="example"><code class="language-javascript">$(".boxer").boxer({
+				<pre class="example"><code class="language-javascript">$(".lightbox").boxer({
     formatter: formatCaptions
 });
 
@@ -331,7 +331,7 @@ function formatCaptions($target) {
 
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="boxer boxer_image boxer_format" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-1.jpg" class="lightbox boxer_image boxer_format" title="By NASA on The Commons (Apollo-Soyuz) [Public domain], via Wikimedia Commons">
 					    <img src="http://formstone.it/files/demo/nasa-bw-1.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
@@ -342,17 +342,17 @@ function formatCaptions($target) {
 				<h2>Retina Support</h2>
 				<p>To display images at "retina" quality the original image dimentions of halved, sizing the images to at least 2x pixel-density and ensuring crisp images on your fancy new display.</p>
 
-				<pre class="example"><code class="language-javascript">$(".boxer").boxer({
+				<pre class="example"><code class="language-javascript">$(".lightbox").boxer({
     retina: true
 });</code></pre>
 
-				<pre class="example"><code class="language-markup">&lt;a href="image-2x.jpg" class="boxer" title="Caption - Retina"&gt;
+				<pre class="example"><code class="language-markup">&lt;a href="image-2x.jpg" class="lightbox" title="Caption - Retina"&gt;
     &lt;img src="thumbnail-2x.jpg" alt="Thumbnail - Retina" /&gt;
 &lt;/a&gt;</code></pre>
 
 				<h5>Demo</h5>
 				<div class="clear_fix">
-					<a href="http://formstone.it/files/demo/nasa-bw-retina.jpg" class="boxer boxer_image retina" title="By Apollo 15 astronaut.Bubba73 at en.wikipedia [Public domain], from Wikimedia Commons">
+					<a href="http://formstone.it/files/demo/nasa-bw-retina.jpg" class="lightbox boxer_image retina" title="By Apollo 15 astronaut.Bubba73 at en.wikipedia [Public domain], from Wikimedia Commons">
 						<img src="http://formstone.it/files/demo/nasa-bw-retina.jpg" alt="" style="height: 100px;">
 					</a>
 				</div>
