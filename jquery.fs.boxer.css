@@ -10,7 +10,7 @@
 .boxer-lock {
   overflow: hidden !important;
 }
-#boxer-overlay {
+.boxer-overlay {
   width: 100%;
   height: 100%;
   position: fixed;
@@ -24,10 +24,10 @@
   -webkit-transition: opacity 0.25s linear;
           transition: opacity 0.25s linear;
 }
-.boxer-open #boxer-overlay {
+.boxer-open .boxer-overlay {
   opacity: 0.75;
 }
-#boxer {
+.boxer {
   width: 200px;
   height: 200px;
   position: absolute;
@@ -41,50 +41,50 @@
   margin: 0 auto;
   padding: 10px;
 }
-#boxer * {
+.boxer * {
   -webkit-transition: none;
           transition: none;
 }
-#boxer,
-#boxer * {
+.boxer,
+.boxer * {
   -webkit-user-select: none !important;
      -moz-user-select: none !important;
       -ms-user-select: none !important;
           user-select: none !important;
 }
-#boxer,
-#boxer *,
-#boxer *:before,
-#boxer *:after {
+.boxer,
+.boxer *,
+.boxer *:before,
+.boxer *:after {
   -moz-box-sizing: border-box;
        box-sizing: border-box;
 }
-#boxer.fixed {
+.boxer-fixed {
   position: fixed;
   top: 0;
   bottom: 0;
   margin: auto;
 }
-#boxer.inline {
+.boxer-inline {
   padding: 30px;
 }
-#boxer.animating {
+.boxer-animating {
   -webkit-transition: height 0.25s ease, width 0.25s ease, opacity 0.25s linear, top 0.25s ease;
           transition: height 0.25s ease, width 0.25s ease, opacity 0.25s linear, top 0.25s ease;
 }
-#boxer.animating .boxer-container {
+.boxer-animating .boxer-container {
   -webkit-transition: opacity 0.25s linear 0.25s;
           transition: opacity 0.25s linear 0.25s;
 }
-.boxer-open #boxer {
+.boxer-open .boxer {
   opacity: 1;
 }
-#boxer.loading .boxer-container {
+.boxer-loading .boxer-container {
   opacity: 0;
   -webkit-transition: opacity 0.25s linear;
           transition: opacity 0.25s linear;
 }
-#boxer .boxer-close {
+.boxer .boxer-close {
   width: 30px;
   height: 30px;
   position: absolute;
@@ -100,7 +100,7 @@
   text-indent: 200%;
   white-space: nowrap;
 }
-#boxer .boxer-close:before {
+.boxer .boxer-close:before {
   position: absolute;
   top: 0;
   right: 0;
@@ -118,10 +118,10 @@
   -webkit-transition: color 0.15s linear;
           transition: color 0.15s linear;
 }
-.no-opacity #boxer .boxer-close {
+.no-opacity .boxer .boxer-close {
   text-indent: -999px;
 }
-#boxer .boxer-loading {
+.boxer .boxer-loading-icon {
   width: 50px;
   height: 50px;
   position: absolute;
@@ -136,8 +136,8 @@
   -webkit-transition: opacity 0.25s linear;
           transition: opacity 0.25s linear;
 }
-#boxer .boxer-loading:before,
-#boxer .boxer-loading:after {
+.boxer .boxer-loading-icon:before,
+.boxer .boxer-loading-icon:after {
   width: 100%;
   height: 100%;
   position: absolute;
@@ -149,16 +149,16 @@
   content: '';
   display: block;
 }
-#boxer .boxer-loading:before {
+.boxer .boxer-loading-icon:before {
   border: 5px solid rgba(51, 51, 51, 0.25);
 }
-#boxer .boxer-loading:after {
+.boxer .boxer-loading-icon:after {
   -webkit-animation: boxer-loading-spin 0.75s linear infinite;
           animation: boxer-loading-spin 0.75s linear infinite;
   border: 5px solid transparent;
   border-top-color: #333333;
 }
-#boxer.loading .boxer-loading {
+.boxer-loading .boxer-loading-icon {
   opacity: 1;
 }
 @-webkit-keyframes boxer-loading-spin {
@@ -181,7 +181,7 @@
             transform: rotate(360deg);
   }
 }
-#boxer .boxer-container {
+.boxer .boxer-container {
   width: 100%;
   height: 100%;
   position: relative;
@@ -189,35 +189,35 @@
   background: #ffffff;
   overflow: hidden;
 }
-#boxer .boxer-content {
+.boxer .boxer-content {
   width: 100%;
   background: #ffffff;
   opacity: 1;
   overflow: hidden;
   padding: 0;
 }
-#boxer.inline .boxer-content,
-#boxer.iframe .boxer-content {
+.boxer-inline .boxer-content,
+.boxer-iframe .boxer-content {
   width: auto;
 }
-#boxer .boxer-image {
+.boxer .boxer-image {
   float: left;
 }
-#boxer .boxer-video {
+.boxer .boxer-video {
   width: 100%;
   height: 100%;
 }
-#boxer .boxer-iframe {
+.boxer .boxer-iframe iframe {
   width: 100%;
   height: 100%;
   border: none;
   float: left;
   overflow: auto;
 }
-#boxer .boxer-meta {
+.boxer .boxer-meta {
   clear: both;
 }
-#boxer .boxer-control {
+.boxer .boxer-control {
   width: 40px;
   height: 40px;
   position: absolute;
@@ -236,7 +236,7 @@
           transition: opacity 0.15s linear;
   white-space: nowrap;
 }
-#boxer .boxer-control:before {
+.boxer .boxer-control:before {
   width: 0;
   height: 0;
   position: absolute;
@@ -247,62 +247,62 @@
   content: '';
   margin: auto;
 }
-#boxer .boxer-control.previous {
+.boxer .boxer-control-previous {
   left: 20px;
 }
-#boxer .boxer-control.previous:before {
+.boxer .boxer-control-previous:before {
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
   border-right: 10.4px solid #333333;
   margin-left: 14px;
 }
-#boxer .boxer-control.next {
+.boxer .boxer-control-next {
   right: 20px;
 }
-#boxer .boxer-control.next:before {
+.boxer .boxer-control-next:before {
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
   border-left: 10.4px solid #333333;
   margin-right: 14px;
 }
-#boxer .boxer-control.disabled {
+.boxer .boxer-control-disabled {
   opacity: 0;
 }
-.no-opacity #boxer .boxer-control {
+.no-opacity .boxer .boxer-control {
   text-indent: -999px;
 }
-.no-touch #boxer .boxer-control {
+.no-touch .boxer .boxer-control {
   opacity: 0;
 }
-.no-touch #boxer:hover .boxer-control {
+.no-touch .boxer:hover .boxer-control {
   opacity: 1;
 }
-.no-touch #boxer:hover .boxer-control.disabled {
+.no-touch .boxer:hover .boxer-control-disabled {
   opacity: 0;
   cursor: default !important;
 }
-#boxer .boxer-meta {
+.boxer .boxer-meta {
   padding: 10px 0 0 0;
 }
-#boxer .boxer-position {
+.boxer .boxer-position {
   color: #999999;
   font-size: 12px;
   margin: 0;
   padding: 15px 15px 0 15px;
 }
-#boxer .boxer-caption p {
+.boxer .boxer-caption p {
   color: #666666;
   font-size: 14px;
   margin: 0;
   padding: 15px;
 }
-#boxer .boxer-caption.gallery p {
+.boxer .boxer-caption-gallery p {
   padding-top: 0;
 }
-#boxer .boxer-error {
+.boxer .boxer-error {
   width: 250px;
 }
-#boxer .boxer-error p {
+.boxer .boxer-error p {
   color: #990000;
   font-size: 14px;
   margin: 0;
@@ -310,7 +310,7 @@
   text-align: center;
   text-transform: uppercase;
 }
-#boxer.mobile {
+.boxer-mobile {
   width: 100%;
   height: 100%;
   position: fixed;
@@ -322,8 +322,8 @@
   border-radius: 0;
   padding: 40px 0 0;
 }
-#boxer.mobile .boxer-close,
-#boxer.mobile .boxer-close:hover {
+.boxer-mobile .boxer-close,
+.boxer-mobile .boxer-close:hover {
   height: 40px;
   width: 40px;
   top: 0;
@@ -331,26 +331,26 @@
   background: #111111;
   border-radius: 0;
 }
-#boxer.mobile .boxer-close:before,
-#boxer.mobile .boxer-close:hover:before {
+.boxer-mobile .boxer-close:before,
+.boxer-mobile .boxer-close:hover:before {
   color: #cccccc;
   font-size: 28px;
   font-weight: 700;
   line-height: 40px;
 }
-#boxer.mobile .boxer-loading:before {
+.boxer-mobile .boxer-loading-icon:before {
   border-color: rgba(153, 153, 153, 0.25);
 }
-#boxer.mobile .boxer-loading:after {
+.boxer-mobile .boxer-loading-icon:after {
   border-top-color: #999999;
 }
-#boxer.mobile .boxer-container {
+.boxer-mobile .boxer-container {
   background: #111111;
 }
-#boxer.mobile .boxer-content {
+.boxer-mobile .boxer-content {
   background-color: #111111;
 }
-#boxer.mobile .boxer-control {
+.boxer-mobile .boxer-control {
   width: 50px;
   height: 100%;
   background: #111111;
@@ -358,30 +358,30 @@
   box-shadow: none;
   opacity: 1;
 }
-#boxer.mobile .boxer-control.previous {
+.boxer-mobile .boxer-control-previous {
   left: 0;
 }
-#boxer.mobile .boxer-control.previous:before {
+.boxer-mobile .boxer-control-previous:before {
   border-right-color: #eeeeee;
   margin-left: 19px;
 }
-#boxer.mobile .boxer-control.next {
+.boxer-mobile .boxer-control-next {
   right: 0;
 }
-#boxer.mobile .boxer-control.next:before {
+.boxer-mobile .boxer-control-next:before {
   border-left-color: #eeeeee;
   margin-right: 19px;
 }
-.no-touch #boxer.mobile .boxer-control,
-.no-touch #boxer.mobile:hover .boxer-control {
+.no-touch .boxer-mobile .boxer-control,
+.no-touch .boxer-mobile:hover .boxer-control {
   opacity: 1;
 }
-.no-touch #boxer.mobile .boxer-control.disabled,
-.no-touch #boxer.mobile:hover .boxer-control.disabled {
+.no-touch .boxer-mobile .boxer-control-disabled,
+.no-touch .boxer-mobile:hover .boxer-control-disabled {
   opacity: 0;
   cursor: default !important;
 }
-#boxer.mobile .boxer-meta {
+.boxer-mobile .boxer-meta {
   width: 100%;
   position: absolute;
   right: 0;
@@ -390,31 +390,31 @@
   background-color: #111111;
   padding: 15px 65px;
 }
-#boxer.mobile .boxer-position {
+.boxer-mobile .boxer-position {
   color: #999999;
   font-size: 12px;
   margin: 0;
   padding: 0 15px 0 0;
 }
-#boxer.mobile .boxer-caption p {
+.boxer-mobile .boxer-caption p {
   color: #eeeeee;
   font-size: 14px;
   margin: 0;
   padding: 0;
 }
-#boxer.mobile .boxer-image {
+.boxer-mobile .boxer-image {
   -webkit-transition: none !important;
           transition: none !important;
   -webkit-transform: translate(0, 0);
       -ms-transform: translate(0, 0);
           transform: translate(0, 0);
 }
-#boxer.mobile.animated .boxer-image {
+.boxer-mobile-animated .boxer-image {
   -webkit-transition: -webkit-transform 0.25s ease-out !important;
           transition: transform 0.25s ease-out !important;
 }
-#boxer.mobile.inline .boxer-content,
-#boxer.mobile.iframe .boxer-content {
+.boxer-mobile-inline .boxer-content,
+.boxer-mobile-iframe .boxer-content {
   overflow-x: hidden;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;

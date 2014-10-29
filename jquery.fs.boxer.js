@@ -9,11 +9,55 @@
 ;(function ($, window) {
 	"use strict";
 
-	var $body = null,
-		data = {},
+	var namespace = "boxer",
+		$window = null,
+		$body = null,
 		trueMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test((window.navigator.userAgent||window.navigator.vendor||window.opera)),
-		transitionEvent,
-		transitionSupported;
+		transitionSupported = true,
+		data = {},
+		classes = {
+			overlay: "boxer-overlay",
+			base: "boxer",
+			close: "boxer-close",
+			loading: "boxer-loading-icon",
+			container: "boxer-container",
+			content: "boxer-content",
+			image: "boxer-image",
+			video: "boxer-video",
+			videoWrapper: "boxer-video-wrapper",
+			meta: "boxer-meta",
+			control: "boxer-control",
+			controlPrevious: "boxer-control-previous",
+			controlNext: "boxer-control-next",
+			controlDisabled: "boxer-control-disabled",
+			position: "boxer-position",
+			positionCurrent: "boxer-position-current",
+			positionTotal: "boxer-position-total",
+			caption: "boxer-caption",
+			captionGallery: "boxer-caption-gallery",
+			error: "boxer-error",
+			isLoading: "boxer-loading",
+			isAnimating: "boxer-animating",
+			isFixed: "boxer-fixed",
+			isMobile: "boxer-mobile",
+			isInline: "boxer-inline",
+			isIframe: "boxer-iframe",
+			isOpen: "boxer-open"
+		},
+		events = {
+			// trigger
+			close: "close." + namespace,
+			open: "open." + namespace,
+			// listen
+			click: "click." + namespace,
+			keydown: "keydown." + namespace,
+			resize: "resize." + namespace,
+			load: "load." + namespace,
+			touchStartClick: "touchstart." + namespace + " click." + namespace,
+			touchStart: "touchstart." + namespace,
+			touchMove: "touchmove." + namespace,
+			touchEnd: "touchend." + namespace
+		};
 
 	/**
 	 * @options
@@ -77,8 +121,8 @@
 		 */
 		close: function() {
 			if (typeof data.$boxer !== "undefined") {
-				data.$boxer.off(".boxer");
-				data.$overlay.trigger("click");
+				data.$boxer.off( classify(namespace) );
+				data.$overlay.triggerHandler(events.click);
 			}
 		},
 
@@ -101,7 +145,7 @@
 		 * @example $(".target").boxer("destroy");
 		 */
 		destroy: function() {
-			return $(this).off(".boxer");
+			return $(this).off( classify(namespace) );
 		},
 
 		/**
@@ -120,7 +164,7 @@
 				}
 
 				if (data.type === "element") {
-					sizeContent(data.$content.find(">:first-child"));
+					sizeContent(data.$content.find("> :first-child"));
 				} else if (data.type === "image") {
 					sizeImage();
 				} else if (data.type === "video") {
@@ -142,16 +186,12 @@
 	function init(opts) {
 		options.formatter = formatCaption;
 
+		$window = $(window);
 		$body = $("body");
-		transitionEvent = getTransitionEvent();
-		transitionSupported = (transitionEvent !== false);
 
-		// no transitions :(
-		if (!transitionSupported) {
-			transitionEvent = "transitionend.boxer";
-		}
+		events.transition = getTransitionEvent();
 
-		return $(this).on("click.boxer", $.extend({}, options, opts || {}), build);
+		return $(this).on(events.click, $.extend({}, options, opts || {}), build);
 	}
 
 	/**
@@ -181,7 +221,7 @@
 			}
 
 			// Check if boxer is already active, retain default click
-			if ($("#boxer").length > 1 || !(isImage || isVideo || isUrl || isElement || isObject)) {
+			if ( !(isImage || isVideo || isUrl || isElement || isObject) ) {
 				return;
 			}
 
@@ -190,8 +230,6 @@
 
 			// Cache internal data
 			data = $.extend({}, {
-				$window: $(window),
-				$body: $("body"),
 				$target: $target,
 				$object: $object,
 				visible: false,
@@ -233,63 +271,64 @@
 			// Assemble HTML
 			var html = '';
 			if (!data.isMobile) {
-				html += '<div id="boxer-overlay" class="' + data.customClass + '"></div>';
+				html += '<div class="' + [classes.overlay, data.customClass].join(" ") + '"></div>';
 			}
-			html += '<div id="boxer" class="loading animating ' + data.customClass;
+			html += '<div class="' + [classes.base, classes.isLoading, classes.isAnimating, data.customClass].join(" ");
 			if (data.fixed) {
-				html += ' fixed';
+				html += classes.isFixed;
 			}
 			if (data.isMobile) {
-				html += ' mobile';
+				html += classes.isMobile;
 			}
 			if (isUrl) {
-				html += ' iframe';
+				html += classes.isIframe;
 			}
 			if (isElement || isObject) {
-				html += ' inline';
+				html += classes.isInline;
 			}
 			html += '">';
-			html += '<span class="boxer-close">' + data.labels.close + '</span>';
-			html += '<span class="boxer-loading"></span>';
-			html += '<div class="boxer-container">';
-			html += '<div class="boxer-content">';
+			html += '<span class="' + classes.close + '">' + data.labels.close + '</span>';
+			html += '<span class="' + classes.loading + '"></span>';
+			html += '<div class="' + classes.container + '">';
+			html += '<div class="' + classes.content + '">';
 			if (isImage || isVideo) {
-				html += '<div class="boxer-meta">';
+				html += '<div class="' + classes.meta + '">';
 
 				if (data.gallery.active) {
-					html += '<div class="boxer-control previous">' + data.labels.previous + '</div>';
-					html += '<div class="boxer-control next">' + data.labels.next + '</div>';
-					html += '<p class="boxer-position"';
+					html += '<div class="' + [classes.control, classes.controlPrevious].join(" ") + '">' + data.labels.previous + '</div>';
+					html += '<div class="' + [classes.control, classes.controlNext].join(" ") + '">' + data.labels.next + '</div>';
+					html += '<p class="' + classes.position + '"';
 					if (data.gallery.total < 1) {
 						html += ' style="display: none;"';
 					}
 					html += '>';
 					html += '<span class="current">' + (data.gallery.index + 1) + '</span> ' + data.labels.count + ' <span class="total">' + (data.gallery.total + 1) + '</span>';
 					html += '</p>';
-					html += '<div class="boxer-caption gallery">';
+					html += '<div class="' + [classes.caption, classes.captionGallery].join(" ") + '">';
 				} else {
-					html += '<div class="boxer-caption">';
+					html += '<div class="' + classes.caption + '">';
 				}
 
-				html += data.formatter.apply(data.$body, [data.$target]);
+				html += data.formatter.apply($window, [data.$target]);
 				html += '</div></div>'; // caption, meta
 			}
 			html += '</div></div></div>'; //container, content, boxer
 
 			// Modify Dom
-			data.$body.append(html);
+			$body.append(html);
 
 			// Cache jquery objects
-			data.$overlay = $("#boxer-overlay");
-			data.$boxer = $("#boxer");
-			data.$container = data.$boxer.find(".boxer-container");
-			data.$content = data.$boxer.find(".boxer-content");
-			data.$meta = data.$boxer.find(".boxer-meta");
-			data.$position = data.$boxer.find(".boxer-position");
-			data.$caption = data.$boxer.find(".boxer-caption");
-			data.$controls = data.$boxer.find(".boxer-control");
+			data.$overlay = $( classify(classes.overlay) );
+			data.$boxer = $( classify(classes.base) );
+			data.$close = data.$boxer.find( classify(classes.close) );
+			data.$container = data.$boxer.find( classify(classes.container) );
+			data.$content = data.$boxer.find( classify(classes.content) );
+			data.$meta = data.$boxer.find( classify(classes.meta) );
+			data.$position = data.$boxer.find( classify(classes.position) );
+			data.$caption = data.$boxer.find( classify(classes.caption) );
+			data.$controls = data.$boxer.find( classify(classes.control) );
 
-			data.paddingVertical = (!data.isMobile) ? (parseInt(data.$boxer.css("paddingTop"), 10) + parseInt(data.$boxer.css("paddingBottom"), 10)) : (data.$boxer.find(".boxer-close").outerHeight() / 2);
+			data.paddingVertical = (!data.isMobile) ? (parseInt(data.$boxer.css("paddingTop"), 10) + parseInt(data.$boxer.css("paddingBottom"), 10)) : (data.$close.outerHeight() / 2);
 			data.paddingHorizontal = (!data.isMobile) ? (parseInt(data.$boxer.css("paddingLeft"), 10) + parseInt(data.$boxer.css("paddingRight"), 10)) : 0;
 			data.contentHeight = data.$boxer.outerHeight() - data.paddingVertical;
 			data.contentWidth = data.$boxer.outerWidth()   - data.paddingHorizontal;
@@ -304,21 +343,21 @@
 			}
 
 			// Bind events
-			data.$window.on("resize.boxer", pub.resize)
-						.on("keydown.boxer", onKeypress);
+			$window.on(events.resize, pub.resize)
+				   .on(events.keydown, onKeydown);
 
-			data.$body.on("touchstart.boxer click.boxer", "#boxer-overlay, #boxer .boxer-close", onClose)
-					  .on("touchmove.boxer", killEvent);
+			$body.on(events.touchStartClick, [classify(classes.overlay), classify(classes.close)].join(", "), onClose)
+				 .on(events.move, killEvent);
 
 			if (data.gallery.active) {
-				data.$boxer.on("touchstart.boxer click.boxer", ".boxer-control", advanceGallery);
+				data.$boxer.on(events.touchStartClick, classify(classes.control), advanceGallery);
 			}
 
-			data.$boxer.on(transitionEvent, function(e) {
+			data.$boxer.on(events.transition, function(e) {
 				killEvent(e);
 
 				if ($(e.target).is(data.$boxer)) {
-					data.$boxer.off(transitionEvent);
+					data.$boxer.off(events.transition);
 
 					if (isImage) {
 						loadImage(source);
@@ -336,10 +375,10 @@
 				}
 			});
 
-			$body.addClass("boxer-open");
+			$body.addClass(classes.isOpen);
 
 			if (!transitionSupported) {
-				data.$boxer.trigger(transitionEvent);
+				data.$boxer.triggerHandler(events.transition);
 			}
 
 			if (isObject) {
@@ -358,11 +397,11 @@
 		killEvent(e);
 
 		if (typeof data.$boxer !== "undefined") {
-			data.$boxer.on(transitionEvent, function(e) {
+			data.$boxer.on(events.transition, function(e) {
 				killEvent(e);
 
 				if ($(e.target).is(data.$boxer)) {
-					data.$boxer.off(transitionEvent);
+					data.$boxer.off(events.transition);
 
 					data.$overlay.remove();
 					data.$boxer.remove();
@@ -370,34 +409,33 @@
 					// reset data
 					data = {};
 				}
-			}).addClass("animating");
+			}).addClass(classes.isAnimating);
 
-			$body.removeClass("boxer-open");
+			$body.removeClass(classes.isOpen);
 
 			if (!transitionSupported) {
-				data.$boxer.trigger(transitionEvent);
+				data.$boxer.triggerHandler(events.transition);
 			}
 
 			clearTimer(data.resizeTimer);
 
 			// Clean up
-			data.$window.off("resize.boxer")
-						.off("keydown.boxer");
+			$window.off( classify(namespace) );
 
-			data.$body.off(".boxer")
-					  .removeClass("boxer-open");
+			$body.off( classify(namespace) )
+				 .removeClass(classes.isOpen);
 
 			if (data.gallery.active) {
-				data.$boxer.off(".boxer");
+				data.$boxer.off( classify(namespace) );
 			}
 
 			if (data.isMobile) {
 				if (data.type === "image" && data.gallery.active) {
-					data.$container.off(".boxer");
+					data.$container.off( classify(namespace) );
 				}
 			}
 
-			data.$window.trigger("close.boxer");
+			$window.trigger(events.close);
 		}
 	}
 
@@ -417,42 +455,42 @@
 		}
 
 		if (!data.visible && data.isMobile && data.gallery.active) {
-			data.$content.on("touchstart.boxer", ".boxer-image", onTouchStart);
+			data.$content.on(events.start, classify(classes.image), onTouchStart);
 		}
 
 		if (data.isMobile || data.fixed) {
-			data.$body.addClass("boxer-open");
+			$body.addClass(classes.isOpen);
 		}
 
-		data.$boxer.on(transitionEvent, function(e) {
+		data.$boxer.on(events.transition, function(e) {
 			killEvent(e);
 
 			if ($(e.target).is(data.$boxer)) {
-				data.$boxer.off(transitionEvent);
+				data.$boxer.off(events.transition);
 
-				data.$container.on(transitionEvent, function(e) {
+				data.$container.on(events.transition, function(e) {
 					killEvent(e);
 
 					if ($(e.target).is(data.$container)) {
-						data.$container.off(transitionEvent);
+						data.$container.off(events.transition);
 
-						data.$boxer.removeClass("animating");
+						data.$boxer.removeClass(classes.isAnimating);
 
 						data.isAnimating = false;
 					}
 				});
 
-				data.$boxer.removeClass("loading");
+				data.$boxer.removeClass(classes.isLoading);
 
 				if (!transitionSupported) {
-					data.$content.trigger(transitionEvent);
+					data.$content.triggerHandler(events.transition);
 				}
 
 				data.visible = true;
 
 				// Fire callback + event
 				data.callback.apply(data.$boxer);
-				data.$window.trigger("open.boxer");
+				$window.trigger(events.open);
 
 				// Start preloading
 				if (data.gallery.active) {
@@ -473,7 +511,7 @@
 		var contentHasChanged = (data.oldContentHeight !== data.contentHeight || data.oldContentWidth !== data.contentWidth);
 
 		if (data.isMobile || !transitionSupported || !contentHasChanged) {
-			data.$boxer.trigger(transitionEvent);
+			data.$boxer.triggerHandler(events.transition);
 		}
 
 		// Track content size changes
@@ -530,12 +568,12 @@
 		}
 
 		var pos = {
-			left: (data.$window.width() - data.contentWidth - data.paddingHorizontal) / 2,
-			top: (data.top <= 0) ? ((data.$window.height() - data.contentHeight - data.paddingVertical) / 2) : data.top
+			left: ($window.width() - data.contentWidth - data.paddingHorizontal) / 2,
+			top: (data.top <= 0) ? (($window.height() - data.contentHeight - data.paddingVertical) / 2) : data.top
 		};
 
 		if (data.fixed !== true) {
-			pos.top += data.$window.scrollTop();
+			pos.top += $window.scrollTop();
 		}
 
 		return pos;
@@ -560,10 +598,10 @@
 	 */
 	function loadImage(source) {
 		// Cache current image
-		data.$image = $("<img />");
+		data.$image = $("<img>");
 
-		data.$image.load(function() {
-			data.$image.off("load, error");
+		data.$image.on(events.load, function() {
+			data.$image.off( classify(namespace) );
 
 			var naturalSize = calculateNaturalSize(data.$image);
 
@@ -588,11 +626,11 @@
 			open();
 		}).error(loadError)
 		  .attr("src", source)
-		  .addClass("boxer-image");
+		  .addClass(classes.image);
 
 		// If image has already loaded into cache, trigger load event
 		if (data.$image[0].complete || data.$image[0].readyState === 4) {
-			data.$image.trigger("load");
+			data.$image.triggerHandler(events.load);
 		}
 	}
 
@@ -605,8 +643,8 @@
 	function sizeImage() {
 		var count = 0;
 
-		data.windowHeight = data.viewportHeight = data.$window.height() - data.paddingVertical;
-		data.windowWidth  = data.viewportWidth  = data.$window.width()  - data.paddingHorizontal;
+		data.windowHeight = data.viewportHeight = $window.height() - data.paddingVertical;
+		data.windowWidth  = data.viewportWidth  = $window.width()  - data.paddingHorizontal;
 
 		data.contentHeight = Infinity;
 		data.contentWidth = Infinity;
@@ -739,11 +777,11 @@
 	 * @param source [string] "Source video URL"
 	 */
 	function loadVideo(source) {
-		data.$videoWrapper = $('<div class="boxer-video-wrapper" />');
-		data.$video = $('<iframe class="boxer-video" seamless="seamless" />');
+		data.$videoWrapper = $('<div class="' + classes.videoWrapper + '"></div>');
+		data.$video = $('<iframe class="' + classes.video + '" seamless="seamless"></iframe>');
 
 		data.$video.attr("src", source)
-				   .addClass("boxer-video")
+				   .addClass(classes.video)
 				   .prependTo(data.$videoWrapper);
 
 		data.$content.prepend(data.$videoWrapper);
@@ -759,8 +797,8 @@
 	 */
 	function sizeVideo() {
 		// Set initial vars
-		data.windowHeight = data.viewportHeight = data.contentHeight = data.$window.height() - data.paddingVertical;
-		data.windowWidth  = data.viewportWidth  = data.contentWidth  = data.$window.width()  - data.paddingHorizontal;
+		data.windowHeight = data.viewportHeight = data.contentHeight = $window.height() - data.paddingVertical;
+		data.windowWidth  = data.viewportWidth  = data.contentWidth  = $window.width()  - data.paddingHorizontal;
 		data.videoMarginTop = 0;
 		data.videoMarginLeft = 0;
 
@@ -858,11 +896,11 @@
 				data.gallery.index = 0;
 			}
 
-			data.$container.on(transitionEvent, function(e) {
+			data.$container.on(events.transition, function(e) {
 				killEvent(e);
 
 				if ($(e.target).is(data.$container)) {
-					data.$container.off(transitionEvent);
+					data.$container.off(events.transition);
 
 					if (typeof data.$image !== 'undefined') {
 						data.$image.remove();
@@ -872,8 +910,8 @@
 					}
 					data.$target = data.gallery.$items.eq(data.gallery.index);
 
-					data.$caption.html(data.formatter.apply(data.$body, [data.$target]));
-					data.$position.find(".current").html(data.gallery.index + 1);
+					data.$caption.html(data.formatter.apply($body, [data.$target]));
+					data.$position.find(classes.positionCurrent).html(data.gallery.index + 1);
 
 					var source = data.$target.attr("href"),
 						isVideo = ( source.indexOf("youtube.com/embed") > -1 || source.indexOf("player.vimeo.com/video") > -1 );
@@ -887,10 +925,10 @@
 				}
 			});
 
-			data.$boxer.addClass("loading animating");
+			data.$boxer.addClass( [classes.isLoading, classes.isAnimating].join(" "));
 
 			if (!transitionSupported) {
-				data.$content.trigger(transitionEvent);
+				data.$content.triggerHandler(events.transition);
 			}
 		}
 	}
@@ -901,28 +939,28 @@
 	 * @description Updates gallery control states
 	 */
 	function updateControls() {
-		data.$controls.removeClass("disabled");
+		data.$controls.removeClass(classes.controlDisabled);
 		if (data.gallery.index === 0) {
-			data.$controls.filter(".previous").addClass("disabled");
+			data.$controls.filter(classes.controlPrevious).addClass(classes.controlDisabled);
 		}
 		if (data.gallery.index === data.gallery.total) {
-			data.$controls.filter(".next").addClass("disabled");
+			data.$controls.filter(classes.controlNext).addClass(classes.controlDisabled);
 		}
 	}
 
 	/**
 	 * @method private
-	 * @name onKeypress
+	 * @name onKeydown
 	 * @description Handles keypress in gallery
 	 * @param e [object] "Event data"
 	 */
-	function onKeypress(e) {
+	function onKeydown(e) {
 		if (data.gallery.active && (e.keyCode === 37 || e.keyCode === 39)) {
 			killEvent(e);
 
-			data.$controls.filter((e.keyCode === 37) ? ".previous" : ".next").trigger("click");
+			data.$controls.filter((e.keyCode === 37) ? classes.controlPrevious : classes.controlNext).triggerHandler(events.click);
 		} else if (e.keyCode === 27) {
-			data.$boxer.find(".boxer-close").trigger("click");
+			data.$close.triggerHandler(events.click);
 		}
 	}
 
@@ -933,7 +971,7 @@
 	 * @param id [string] "Target element id"
 	 */
 	function cloneElement(id) {
-		var $clone = $(id).find(">:first-child").clone();
+		var $clone = $(id).find("> :first-child").clone();
 		appendObject($clone);
 	}
 
@@ -944,8 +982,8 @@
 	 * @param source [string] "Target URL"
 	 */
 	function loadURL(source) {
-		source = source + ((source.indexOf("?") > -1) ? "&"+options.requestKey+"=true" : "?"+options.requestKey+"=true");
-		var $iframe = $('<iframe class="boxer-iframe" src="' + source + '" />');
+		source = source + ((source.indexOf("?") > -1) ? "&" + options.requestKey + "=true" : "?" + options.requestKey + "=true");
+		var $iframe = $('<iframe class="' + classes.isIframe + '" src="' + source + '"></iframe>');
 		appendObject($iframe);
 	}
 
@@ -968,8 +1006,8 @@
 	 * @param $object [jQuery Object] "Object to size"
 	 */
 	function sizeContent($object) {
-		data.windowHeight	  = data.$window.height() - data.paddingVertical;
-		data.windowWidth	  = data.$window.width() - data.paddingHorizontal;
+		data.windowHeight	  = $window.height() - data.paddingVertical;
+		data.windowWidth	  = $window.width() - data.paddingHorizontal;
 		data.objectHeight	  = $object.outerHeight(true);
 		data.objectWidth	  = $object.outerWidth(true);
 		data.targetHeight	  = data.targetHeight || data.$target.data("boxer-height");
@@ -1003,13 +1041,13 @@
 	 * @param e [object] "Event data"
 	 */
 	function loadError(e) {
-		var $error = $('<div class="boxer-error"><p>Error Loading Resource</p></div>');
+		var $error = $('<div class="' + classes.error + '"><p>Error Loading Resource</p></div>');
 
 		// Clean up
 		data.type = "element";
 		data.$meta.remove();
 
-		data.$image.off("load, error");
+		data.$image.off( classify(namespace) );
 
 		appendObject($error);
 	}
@@ -1040,8 +1078,8 @@
 				data.touchMin = 0;
 			}
 
-			data.$boxer.on("touchmove.boxer", onTouchMove)
-					   .one("touchend.boxer", onTouchEnd);
+			data.$boxer.on(events.touchMove, onTouchMove)
+					   .one(events.touchEnd, onTouchEnd);
 		}
 	}
 
@@ -1088,10 +1126,10 @@
 		killEvent(e);
 		clearTimer(data.touchTimer);
 
-		data.$boxer.off("touchmove.boxer touchend.boxer");
+		data.$boxer.off( [events.touchMove, events.touchEnd].join("") );
 
 		if (data.delta) {
-			data.$boxer.addClass("animated");
+			data.$boxer.addClass(classes.isAnimating);
 			data.swipe = false;
 
 			if (data.canSwipe && (data.delta > data.edge || data.delta < -data.edge)) {
@@ -1106,10 +1144,10 @@
 			}
 
 			if (data.swipe) {
-				data.$controls.filter( (data.delta <= data.leftPosition) ? ".previous" : ".next" ).trigger("click");
+				data.$controls.filter( (data.delta <= data.leftPosition) ? ".previous" : ".next" ).triggerHandler(events.click);
 			}
 			startTimer(data.resetTimer, data.duration, function() {
-				data.$boxer.removeClass("animated");
+				data.$boxer.removeClass(classes.isAnimating);
 			});
 		}
 	}
@@ -1197,18 +1235,36 @@
 				'OTransition':      'oTransitionEnd',
 				'transition':       'transitionend'
 			},
+			event = false,
 			test = document.createElement('div');
 
 		for (var type in transitions) {
 			if (transitions.hasOwnProperty(type) && type in test.style) {
-				return transitions[type];
+				event = transitions[type];
 			}
 		}
 
-		return false;
+		// no transitions :(
+		if (!event) {
+			event = "transitionend";
+			transitionSupported = false;
+		}
+
+		return event + classify(namespace);
 	}
 
-	$.fn.boxer = function(method) {
+	/**
+	 * @method private
+	 * @name classify
+	 * @description Create class selector from text
+	 * @param text [string] "Text to convert"
+	 * @return [string] "New class name"
+	 */
+	function classify(text) {
+		return "." + text;
+	}
+
+	$.fn[namespace] = function(method) {
 		if (pub[method]) {
 			return pub[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		} else if (typeof method === 'object' || !method) {
@@ -1217,7 +1273,7 @@
 		return this;
 	};
 
-	$.boxer = function($target, opts) {
+	$[namespace] = function($target, opts) {
 		if (pub[$target]) {
 			return pub[$target].apply(window, Array.prototype.slice.call(arguments, 1));
 		} else {

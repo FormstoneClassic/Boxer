@@ -6,7 +6,7 @@
 		overflow: hidden !important;
 	}
 
-	#boxer-overlay {
+	.boxer-overlay {
 		width: 100%;
 		height: 100%;
 
@@ -26,7 +26,7 @@
 		}
 	}
 
-	#boxer {
+	.boxer {
 		width: 200px;
 		height: 200px;
 
@@ -60,7 +60,7 @@
 
 		// .fixed
 
-		&.fixed {
+		&-fixed {
 			position: fixed;
 			top: 0;
 			bottom: 0;
@@ -70,13 +70,13 @@
 
 		// .inline
 
-		&.inline {
+		&-inline {
 			padding: @boxer-inline-padding;
 		}
 
 		// .animating
 
-		&.animating {
+		&-animating {
 			transition:
 				height @boxer-transition-duration @boxer-transition-timing,
 				width @boxer-transition-duration @boxer-transition-timing,
@@ -94,7 +94,7 @@
 			opacity: 1;
 		}
 
-		&.loading .boxer-container {
+		&-loading .boxer-container {
 			opacity: 0;
 			transition: opacity @boxer-transition-duration linear;
 		}
@@ -145,9 +145,9 @@
 			}
 		}
 
-		// .boxer-loading
+		// .boxer-loading-icon
 
-		.boxer-loading {
+		.boxer-loading-icon {
 			width: @boxer-loading-width;
 			height: @boxer-loading-height;
 
@@ -190,7 +190,7 @@
 			}
 		}
 
-		&.loading .boxer-loading {
+		&-loading .boxer-loading-icon {
 			opacity: 1;
 		}
 
@@ -230,8 +230,8 @@
 
 		// Inline .boxer-content
 
-		&.inline .boxer-content,
-		&.iframe .boxer-content {
+		&-inline .boxer-content,
+		&-iframe .boxer-content {
 			width: auto;
 		}
 
@@ -250,7 +250,7 @@
 
 		// .boxer-iframe
 
-		.boxer-iframe {
+		.boxer-iframe iframe {
 			width: 100%;
 			height: 100%;
 
@@ -305,7 +305,7 @@
 				margin: auto;
 			}
 
-			&.previous {
+			&-previous {
 				left: @boxer-control-previous-left;
 
 				&:before {
@@ -316,7 +316,7 @@
 				}
 			}
 
-			&.next {
+			&-next {
 				right: @boxer-control-next-right;
 
 				&:before {
@@ -327,7 +327,7 @@
 				}
 			}
 
-			&.disabled {
+			&-disabled {
 				opacity: 0;
 			}
 
@@ -347,7 +347,7 @@
 		.no-touch &:hover .boxer-control {
 			opacity: @boxer-control-opacity;
 
-			&.disabled {
+			&-disabled {
 				opacity: 0;
 				cursor: default !important;
 			}
@@ -378,7 +378,7 @@
 				padding: @boxer-caption-padding;
 			}
 
-			&.gallery p {
+			&-gallery p {
 				padding-top: 0;
 			}
 		}
@@ -400,7 +400,7 @@
 
 		// .mobile
 
-		&.mobile {
+		&-mobile {
 			width: 100%;
 			height: 100%;
 
@@ -436,13 +436,13 @@
 				line-height: @boxer-mobile-close-height;
 			}
 
-			// .boxer-loading
+			// .boxer-loading-icon
 
-			.boxer-loading:before {
+			.boxer-loading-icon:before {
 				border-color: fade(@boxer-mobile-loading-color, 25);
 			}
 
-			.boxer-loading:after {
+			.boxer-loading-icon:after {
 				border-top-color: @boxer-mobile-loading-color;
 			}
 
@@ -472,7 +472,7 @@
 				// Caret
 				@boxer-mobile-control-carent-margin: (@boxer-mobile-control-width - (@boxer-control-caret-size * 1.5)) / 2;
 
-				&.previous {
+				&-previous {
 					left: 0;
 
 					&:before {
@@ -481,7 +481,7 @@
 					}
 				}
 
-				&.next {
+				&-next {
 					right: 0;
 
 					&:before {
@@ -497,7 +497,7 @@
 			.no-touch &:hover .boxer-control {
 				opacity: @boxer-control-opacity;
 
-				&.disabled {
+				&-disabled {
 					opacity: 0;
 					cursor: default !important;
 				}
@@ -545,14 +545,14 @@
 
 			// .animated
 
-			&.animated .boxer-image {
+			&-animated .boxer-image {
 				transition: transform 0.25s ease-out !important;
 			}
 
 			// .inline / .iframe
 
-			&.inline .boxer-content,
-			&.iframe .boxer-content {
+			&-inline .boxer-content,
+			&-iframe .boxer-content {
 				overflow-x: hidden;
 				overflow-y: scroll;
 				-webkit-overflow-scrolling: touch;
