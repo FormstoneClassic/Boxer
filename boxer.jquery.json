@@ -25,9 +25,9 @@
     "jquery",
     "formstone"
   ],
-  "docs": "http://formstone.it/boxer/",
-  "demo": "http://formstone.it/boxer/",
-  "download": "https://github.com/Formstone/Boxer",
-  "bugs": "https://github.com/Formstone/Boxer/issues",
-  "homepage": "http://formstone.it/boxer/"
+  "docs": "http://classic.formstone.it/boxer/",
+  "demo": "http://classic.formstone.it/boxer/",
+  "download": "https://github.com/FormstoneClassic/Boxer",
+  "bugs": "https://github.com/FormstoneClassic/Boxer/issues",
+  "homepage": "http://classic.formstone.it/boxer/"
 }

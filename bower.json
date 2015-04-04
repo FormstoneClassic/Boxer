@@ -8,7 +8,7 @@
     "url": "http://www.benplum.com"
   },
   "license": "MIT",
-  "homepage": "http://formstone.it/boxer/",
+  "homepage": "http://classic.formstone.it/boxer/",
   "main": [
     "jquery.fs.boxer.js",
     "jquery.fs.boxer.css"
